@@ -7,13 +7,6 @@
       content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover"
     />
     <title>HR Motors – Gestion complète atelier & sinistres</title>
-    <link rel="manifest" href="manifest.json" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta
-      name="apple-mobile-web-app-status-bar-style"
-      content="black-translucent"
-    />
-    <meta name="theme-color" content="#0f172a" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -26,18 +19,16 @@
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-        font-family: "Segoe UI", Roboto, system-ui, sans-serif;
+        font-family: "Segoe UI", Roboto, sans-serif;
       }
       body {
         background: #f1f5f9;
         color: #0f172a;
       }
-      /* Layout */
       .app {
         display: flex;
         min-height: 100vh;
       }
-      /* Sidebar */
       .sidebar {
         width: 270px;
         background: linear-gradient(145deg, #0f172a, #1e293b);
@@ -85,7 +76,6 @@
         background: #3b82f6;
         color: white;
       }
-      /* Main content */
       .main-content {
         margin-left: 270px;
         flex: 1;
@@ -194,6 +184,10 @@
       .btn-warning {
         background: #f59e0b;
         color: white;
+      }
+      .btn-sm {
+        padding: 6px 12px;
+        font-size: 0.75rem;
       }
       .data-table {
         width: 100%;
@@ -340,7 +334,7 @@
 
     <div class="app">
       <aside class="sidebar">
-        <div class="logo"><i class="fas fa-car-crash"></i> HR Motors</div>
+        <div class="logo"><i class="fas fa-car-crash"></i>NTR-App</div>
         <div class="menu-item active" data-tab="dashboard">
           <i class="fas fa-chart-line"></i> Tableau de bord
         </div>
@@ -364,7 +358,7 @@
       <main class="main-content">
         <button class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
         <div class="header">
-          <h1 id="page-title">Gestion atelier & sinistres</h1>
+          <h1 id="page-title">Hr Motors Gestion</h1>
           <div></div>
         </div>
 
@@ -388,14 +382,12 @@
               <div class="number" id="stat-attente-rapport">0</div>
             </div>
           </div>
-
           <div class="form-section">
             <h2><i class="fas fa-sync-alt"></i> Synchronisation des données</h2>
             <div class="sync-bar">
               <p>
                 <strong>📁 Export / Import / Partage</strong> – Sauvegarde ou
-                transfert de toutes vos données (véhicules, travaux, sinistres,
-                documents).
+                transfert de toutes vos données.
               </p>
               <div class="flex-buttons">
                 <button id="export-excel" class="btn btn-success">
@@ -419,7 +411,6 @@
               </div>
             </div>
           </div>
-
           <div class="form-section">
             <h2><i class="fas fa-history"></i> Dernières interventions</h2>
             <div style="overflow-x: auto">
@@ -708,7 +699,7 @@
           </div>
         </div>
 
-        <!-- PHOTOS & DOCUMENTS (attachés aux sinistres) -->
+        <!-- PHOTOS & DOCS -->
         <div id="photos-tab" class="tab-content">
           <div class="form-section">
             <h2><i class="fas fa-folder-open"></i> Documents par sinistre</h2>
@@ -847,7 +838,7 @@
       let vehicles = JSON.parse(localStorage.getItem("hr_vehicles")) || [];
       let works = JSON.parse(localStorage.getItem("hr_works")) || [];
       let sinistres = JSON.parse(localStorage.getItem("hr_sinistres")) || [];
-      let documents = JSON.parse(localStorage.getItem("hr_documents")) || {}; // { sinistreId: [ {id, name, type, dataUrl, date} ] }
+      let documents = JSON.parse(localStorage.getItem("hr_documents")) || {};
 
       function saveAll() {
         localStorage.setItem("hr_vehicles", JSON.stringify(vehicles));
@@ -866,15 +857,61 @@
         return Date.now() + "-" + Math.random().toString(36).substr(2, 8);
       }
 
-      // helpers
       function getVehicleByImmat(immat) {
         return vehicles.find((v) => v.immatriculation === immat);
       }
-      window.addEventListener("beforeunload", () => {
-        const data = { vehicles, works, sinistres, documents };
-        localStorage.setItem("hr_backup_auto", JSON.stringify(data));
+
+      // ---------- NAVIGATION (avec fermeture mobile) ----------
+      function switchTab(tabName) {
+        document
+          .querySelectorAll(".tab-content")
+          .forEach((t) => t.classList.remove("active"));
+        document.getElementById(`${tabName}-tab`).classList.add("active");
+        document
+          .querySelectorAll(".menu-item")
+          .forEach((i) => i.classList.remove("active"));
+        document
+          .querySelector(`.menu-item[data-tab="${tabName}"]`)
+          .classList.add("active");
+        if (tabName === "vehicles") renderVehicles();
+        if (tabName === "works") renderWorks();
+        if (tabName === "sinistres") renderSinistres();
+        if (tabName === "photos") fillSinistreSelect();
+        if (tabName === "dashboard") updateDashboard();
+        // Fermer la sidebar sur mobile après clic
+        if (window.innerWidth <= 768) {
+          document.querySelector(".sidebar").classList.remove("open");
+        }
+      }
+
+      document.querySelectorAll(".menu-item").forEach((item) => {
+        item.addEventListener("click", () => switchTab(item.dataset.tab));
       });
-      // ---------- RENDER VEHICULES ----------
+      document
+        .querySelector(".mobile-menu-btn")
+        ?.addEventListener("click", () =>
+          document.querySelector(".sidebar").classList.toggle("open"),
+        );
+      // Fermer sidebar en cliquant sur le contenu principal (mobile)
+      document.querySelector(".main-content").addEventListener("click", () => {
+        if (window.innerWidth <= 768)
+          document.querySelector(".sidebar").classList.remove("open");
+      });
+      document
+        .querySelectorAll(".close-modal")
+        .forEach((btn) =>
+          btn.addEventListener("click", () =>
+            document
+              .querySelectorAll(".modal")
+              .forEach((m) => (m.style.display = "none")),
+          ),
+        );
+      window.addEventListener("click", (e) => {
+        if (e.target.classList?.contains("modal"))
+          e.target.style.display = "none";
+      });
+
+      // ---------- RENDER VEHICULES (avec bouton Travaux) ----------
       function renderVehicles() {
         let tbody = document.querySelector("#vehicles-table tbody");
         if (!tbody) return;
@@ -883,10 +920,19 @@
           let photoHtml = v.photo
             ? `<img src="${v.photo}" style="width:45px;height:45px;object-fit:cover;border-radius:12px;">`
             : "—";
-          let row = `<tr><td>${v.immatriculation}</td><td>${v.modele || ""}</td><td>${v.proprietaire || ""}</td><td>${photoHtml}</td><td><button class="btn-edit" onclick="openEditVehicle('${v.id}')">✏️</button> <button class="btn-danger" onclick="deleteVehicle('${v.id}')">🗑️</button></td></tr>`;
+          let row = `<tr>
+                <td>${v.immatriculation}</td>
+                <td>${v.modele || ""}</td>
+                <td>${v.proprietaire || ""}</td>
+                <td>${photoHtml}</td>
+                <td class="action-buttons">
+                    <button class="btn-edit" onclick="openEditVehicle('${v.id}')">✏️</button>
+                    <button class="btn-danger" onclick="deleteVehicle('${v.id}')">🗑️</button>
+                    <button class="btn-success btn-sm" onclick="addWorkForVehicle('${v.immatriculation}')">➕ Travaux</button>
+                </td>
+            </tr>`;
           tbody.innerHTML += row;
         });
-        // update datalist
         let datalist = document.getElementById("veh-list-datalist");
         datalist.innerHTML = "";
         vehicles.forEach((v) => {
@@ -896,6 +942,20 @@
         });
         document.getElementById("stat-vehicules").innerText = vehicles.length;
       }
+
+      // Fonction pour pré-remplir le formulaire travaux et basculer sur l'onglet Travaux
+      window.addWorkForVehicle = (immat) => {
+        document.getElementById("work-immat").value = immat;
+        document.getElementById("work-date-entree").value = new Date()
+          .toISOString()
+          .slice(0, 10);
+        switchTab("works");
+        // Optionnel : faire défiler jusqu'au formulaire
+        document
+          .querySelector("#works-tab .form-section")
+          .scrollIntoView({ behavior: "smooth" });
+        showToast(`Préparation d'un travail pour ${immat}`);
+      };
 
       window.openEditVehicle = (id) => {
         let v = vehicles.find((v) => v.id === id);
@@ -979,7 +1039,7 @@
           } else processSave("");
         });
 
-      // ---------- TRAVAUX ----------
+      // ---------- TRAVAUX (avec bouton Sinistre) ----------
       function renderWorks() {
         let tbody = document.querySelector("#works-table tbody");
         if (!tbody) return;
@@ -988,11 +1048,36 @@
           let veh = getVehicleByImmat(w.immatriculation) || {
             immatriculation: w.immatriculation,
           };
-          let row = `<tr><td>${veh.immatriculation}</td><td>${w.type_travaux}</td><td>${w.date_entree}</td><td><span class="status-badge ${w.statut === "terminé" ? "status-termine" : w.statut === "en cours" ? "status-en-cours" : "status-ouvert"}">${w.statut}</span></td><td>${(w.techniciens || []).join(", ")}</td><td><button onclick="editWork('${w.id}')">✏️</button> <button onclick="deleteWork('${w.id}')">🗑️</button></td></tr>`;
+          let row = `<tr>
+                <td>${veh.immatriculation}</td>
+                <td>${w.type_travaux}</td>
+                <td>${w.date_entree}</td>
+                <td><span class="status-badge ${w.statut === "terminé" ? "status-termine" : w.statut === "en cours" ? "status-en-cours" : "status-ouvert"}">${w.statut}</span></td>
+                <td>${(w.techniciens || []).join(", ")}</td>
+                <td class="action-buttons">
+                    <button onclick="editWork('${w.id}')">✏️</button>
+                    <button onclick="deleteWork('${w.id}')">🗑️</button>
+                    <button class="btn-warning btn-sm" onclick="addSinistreForVehicle('${veh.immatriculation}')">⚠️ Sinistre</button>
+                </td>
+            </tr>`;
           tbody.innerHTML += row;
         });
         updateDashboard();
       }
+
+      window.addSinistreForVehicle = (immat) => {
+        document.getElementById("sin-immat").value = immat;
+        // Remplir aussi le type véhicule si disponible
+        let vehicle = getVehicleByImmat(immat);
+        if (vehicle && vehicle.modele)
+          document.getElementById("sin-type").value = vehicle.modele;
+        switchTab("sinistres");
+        document
+          .querySelector("#sinistres-tab .form-section")
+          .scrollIntoView({ behavior: "smooth" });
+        showToast(`Préparation d'un sinistre pour ${immat}`);
+      };
+
       document.getElementById("work-form")?.addEventListener("submit", (e) => {
         e.preventDefault();
         let immat = document
@@ -1056,14 +1141,22 @@
         }
       };
 
-      // ---------- SINISTRES ----------
+      // ---------- SINISTRES (inchangé) ----------
       function renderSinistres(filteredArr = null) {
         let data = filteredArr || sinistres;
         let tbody = document.querySelector("#sinistres-table tbody");
         if (!tbody) return;
         tbody.innerHTML = "";
         data.forEach((s) => {
-          let row = `<tr><td>${s.numero_sinistre}</td><td>${s.assure || ""}</td><td>${s.immatriculation}</td><td>${s.assureur || ""}</td><td><span class="status-badge">${s.statut}</span></td><td>${(s.montant || 0).toLocaleString()}</td><td><button onclick="editSinistre('${s.id}')">✏️</button> <button onclick="deleteSinistre('${s.id}')">🗑️</button></td></tr>`;
+          let row = `<tr>
+                <td>${s.numero_sinistre}</td>
+                <td>${s.assure || ""}</td>
+                <td>${s.immatriculation}</td>
+                <td>${s.assureur || ""}</td>
+                <td><span class="status-badge">${s.statut}</span></td>
+                <td>${(s.montant || 0).toLocaleString()}</td>
+                <td><button onclick="editSinistre('${s.id}')">✏️</button> <button onclick="deleteSinistre('${s.id}')">🗑️</button></td>
+            </table>`;
           tbody.innerHTML += row;
         });
         updateDashboard();
@@ -1089,8 +1182,7 @@
           Array.from(cabinetSelect.options).forEach(
             (opt) => (opt.selected = s.cabinet_expert?.includes(opt.value)),
           );
-          // scroll
-          document.getElementById("sinistres-tab").scrollIntoView();
+          switchTab("sinistres");
         }
       };
       window.deleteSinistre = (id) => {
@@ -1300,7 +1392,6 @@
           sinistresOuverts;
         document.getElementById("stat-attente-rapport").innerText =
           attenteRapport;
-        // derniers travaux
         let lastWorks = [...works]
           .sort((a, b) => new Date(b.date_entree) - new Date(a.date_entree))
           .slice(0, 5);
@@ -1316,7 +1407,6 @@
         }
       }
 
-      // EXPORT / IMPORT
       document.getElementById("export-excel")?.addEventListener("click", () => {
         let ws1 = XLSX.utils.json_to_sheet(
           vehicles.map((v) => ({
@@ -1447,75 +1537,12 @@
           }
         });
 
-      // ---------- NAVIGATION ----------
-      function switchTab(tab) {
-        document
-          .querySelectorAll(".tab-content")
-          .forEach((t) => t.classList.remove("active"));
-        document.getElementById(`${tab}-tab`).classList.add("active");
-        document
-          .querySelectorAll(".menu-item")
-          .forEach((i) => i.classList.remove("active"));
-        document
-          .querySelector(`.menu-item[data-tab="${tab}"]`)
-          .classList.add("active");
-        if (tab === "vehicles") renderVehicles();
-        if (tab === "works") renderWorks();
-        if (tab === "sinistres") renderSinistres();
-        if (tab === "photos") fillSinistreSelect();
-        if (tab === "dashboard") updateDashboard();
-      }
-      document.querySelectorAll('.menu-item').forEach(item => {
-    item.addEventListener('click', () => {
-        const tab = item.dataset.tab;
-        switchTab(tab);
-        
-        // Fermer la sidebar sur mobile après sélection
-        const sidebar = document.querySelector('.sidebar');
-        if (window.innerWidth <= 768) {
-            sidebar.classList.remove('open');
-        }
-    });
-});
-      document
-        .querySelector(".mobile-menu-btn")
-        ?.addEventListener("click", () =>
-          document.querySelector(".sidebar").classList.toggle("open"),
-        );
-      document
-        .querySelectorAll(".close-modal")
-        .forEach((btn) =>
-          btn.addEventListener("click", () =>
-            document
-              .querySelectorAll(".modal")
-              .forEach((m) => (m.style.display = "none")),
-          ),
-        );
-      window.addEventListener("click", (e) => {
-        if (e.target.classList?.contains("modal"))
-          e.target.style.display = "none";
-      });
-
       // initial load
       renderVehicles();
       renderWorks();
       renderSinistres();
       updateDashboard();
       fillSinistreSelect();
-
-      document.querySelector('.main-content').addEventListener('click', () => {
-    if (window.innerWidth <= 768) {
-        document.querySelector('.sidebar').classList.remove('open');
-    }
-});
-    </script>
-    <script>
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker
-          .register("/sw.js")
-          .then((reg) => console.log("SW enregistré", reg))
-          .catch((err) => console.log("Erreur SW", err));
-      }
     </script>
   </body>
 </html>
