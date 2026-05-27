@@ -1,0 +1,1508 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover"
+    />
+    <title>HR Motors – Gestion complète atelier & sinistres</title>
+    <link rel="manifest" href="manifest.json" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="theme-color" content="#0f172a" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Roboto, system-ui, sans-serif;
+      }
+      body {
+        background: #f1f5f9;
+        color: #0f172a;
+      }
+      /* Layout */
+      .app {
+        display: flex;
+        min-height: 100vh;
+      }
+      /* Sidebar */
+      .sidebar {
+        width: 270px;
+        background: linear-gradient(145deg, #0f172a, #1e293b);
+        color: #e2e8f0;
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        padding: 20px 12px;
+        transition: transform 0.3s ease;
+        z-index: 1000;
+        box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+      }
+      .logo {
+        font-size: 1.6rem;
+        font-weight: bold;
+        text-align: center;
+        padding: 15px 0;
+        border-bottom: 1px solid #334155;
+        margin-bottom: 25px;
+      }
+      .logo i {
+        color: #3b82f6;
+        margin-right: 8px;
+      }
+      .menu-item {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        padding: 12px 16px;
+        border-radius: 14px;
+        margin: 6px 0;
+        cursor: pointer;
+        transition: 0.2s;
+        font-weight: 500;
+      }
+      .menu-item i {
+        width: 26px;
+        font-size: 1.2rem;
+      }
+      .menu-item:hover {
+        background: #334155;
+      }
+      .menu-item.active {
+        background: #3b82f6;
+        color: white;
+      }
+      /* Main content */
+      .main-content {
+        margin-left: 270px;
+        flex: 1;
+        padding: 20px 28px;
+      }
+      .mobile-menu-btn {
+        display: none;
+        background: none;
+        border: none;
+        font-size: 1.8rem;
+        cursor: pointer;
+        margin-bottom: 15px;
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+      }
+      .header h1 {
+        font-size: 1.7rem;
+        font-weight: 600;
+      }
+      .stats-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        gap: 18px;
+        margin-bottom: 30px;
+      }
+      .stat-card {
+        background: white;
+        padding: 18px;
+        border-radius: 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        text-align: center;
+        border: 1px solid #e2e8f0;
+      }
+      .stat-card .number {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #0f172a;
+      }
+      .form-section {
+        background: white;
+        border-radius: 24px;
+        padding: 22px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      }
+      .form-section h2 {
+        font-size: 1.3rem;
+        margin-bottom: 18px;
+        border-left: 5px solid #3b82f6;
+        padding-left: 14px;
+      }
+      .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 18px;
+        margin-bottom: 18px;
+      }
+      .form-group {
+        flex: 1 1 240px;
+      }
+      .form-group label {
+        font-weight: 600;
+        display: block;
+        margin-bottom: 6px;
+        font-size: 0.85rem;
+      }
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 10px 14px;
+        border-radius: 14px;
+        border: 1px solid #cbd5e1;
+        font-size: 0.9rem;
+        background: #fff;
+      }
+      .btn {
+        border: none;
+        padding: 10px 20px;
+        border-radius: 40px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+        background: #e2e8f0;
+      }
+      .btn-primary {
+        background: #0f172a;
+        color: white;
+      }
+      .btn-primary:hover {
+        background: #1e293b;
+      }
+      .btn-success {
+        background: #10b981;
+        color: white;
+      }
+      .btn-danger {
+        background: #ef4444;
+        color: white;
+      }
+      .btn-warning {
+        background: #f59e0b;
+        color: white;
+      }
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+        overflow-x: auto;
+        display: block;
+      }
+      .data-table th,
+      .data-table td {
+        padding: 12px 8px;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+      }
+      .status-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 30px;
+        font-size: 0.7rem;
+        font-weight: bold;
+      }
+      .status-ouvert {
+        background: #fee2e2;
+        color: #b91c1c;
+      }
+      .status-en-cours {
+        background: #fef3c7;
+        color: #b45309;
+      }
+      .status-termine {
+        background: #dcfce7;
+        color: #166534;
+      }
+      .photo-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 12px;
+        margin-top: 15px;
+      }
+      .photo-card {
+        background: #f8fafc;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        position: relative;
+        aspect-ratio: 1;
+      }
+      .photo-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 11000;
+        justify-content: center;
+        align-items: center;
+      }
+      .modal-content {
+        background: white;
+        width: 90%;
+        max-width: 750px;
+        max-height: 85vh;
+        overflow-y: auto;
+        border-radius: 28px;
+        padding: 24px;
+      }
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        font-size: 1.3rem;
+        font-weight: bold;
+      }
+      .close-modal {
+        cursor: pointer;
+        font-size: 1.6rem;
+      }
+      .sync-bar {
+        background: #f8fafc;
+        padding: 20px;
+        border-radius: 20px;
+        margin-top: 20px;
+      }
+      .flex-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 15px;
+      }
+      @media (max-width: 768px) {
+        .sidebar {
+          transform: translateX(-100%);
+          width: 260px;
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .main-content {
+          margin-left: 0;
+          padding: 15px;
+        }
+        .mobile-menu-btn {
+          display: block;
+        }
+      }
+      .tab-content {
+        display: none;
+      }
+      .tab-content.active {
+        display: block;
+      }
+      .search-filters {
+        background: #f9f9ff;
+        padding: 15px;
+        border-radius: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="toast-msg"
+      style="
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #0f172a;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 40px;
+        z-index: 12000;
+        transform: translateX(150%);
+        transition: 0.3s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      "
+    ></div>
+
+    <div class="app">
+      <aside class="sidebar">
+        <div class="logo"><i class="fas fa-car-crash"></i> HR Motors</div>
+        <div class="menu-item active" data-tab="dashboard">
+          <i class="fas fa-chart-line"></i> Tableau de bord
+        </div>
+        <div class="menu-item" data-tab="vehicles">
+          <i class="fas fa-car"></i> Véhicules
+        </div>
+        <div class="menu-item" data-tab="works">
+          <i class="fas fa-tools"></i> Travaux
+        </div>
+        <div class="menu-item" data-tab="sinistres">
+          <i class="fas fa-file-alt"></i> Sinistres
+        </div>
+        <div class="menu-item" data-tab="photos">
+          <i class="fas fa-camera"></i> Photos & Docs
+        </div>
+        <div class="menu-item" data-tab="search">
+          <i class="fas fa-search"></i> Recherche
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <button class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
+        <div class="header">
+          <h1 id="page-title">Gestion atelier & sinistres</h1>
+          <div></div>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div id="dashboard-tab" class="tab-content active">
+          <div class="stats-cards">
+            <div class="stat-card">
+              <h3>🚗 Véhicules</h3>
+              <div class="number" id="stat-vehicules">0</div>
+            </div>
+            <div class="stat-card">
+              <h3>🔧 Travaux en cours</h3>
+              <div class="number" id="stat-travaux-en-cours">0</div>
+            </div>
+            <div class="stat-card">
+              <h3>📄 Sinistres ouverts</h3>
+              <div class="number" id="stat-sinistres-ouverts">0</div>
+            </div>
+            <div class="stat-card">
+              <h3>⏳ Attente rapport expert</h3>
+              <div class="number" id="stat-attente-rapport">0</div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h2><i class="fas fa-sync-alt"></i> Synchronisation des données</h2>
+            <div class="sync-bar">
+              <p>
+                <strong>📁 Export / Import / Partage</strong> – Sauvegarde ou
+                transfert de toutes vos données (véhicules, travaux, sinistres,
+                documents).
+              </p>
+              <div class="flex-buttons">
+                <button id="export-excel" class="btn btn-success">
+                  <i class="fas fa-file-excel"></i> Excel complet
+                </button>
+                <button id="export-pdf" class="btn btn-danger">
+                  <i class="fas fa-file-pdf"></i> PDF récapitulatif
+                </button>
+                <label for="import-json-file" class="btn btn-primary"
+                  ><i class="fas fa-upload"></i> Importer JSON</label
+                >
+                <input
+                  type="file"
+                  id="import-json-file"
+                  accept=".json"
+                  style="display: none"
+                />
+                <button id="share-data" class="btn btn-primary">
+                  <i class="fas fa-share-alt"></i> Partager
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h2><i class="fas fa-history"></i> Dernières interventions</h2>
+            <div style="overflow-x: auto">
+              <table class="data-table" id="dashboard-last-works">
+                <thead>
+                  <tr>
+                    <th>Véhicule</th>
+                    <th>Type travaux</th>
+                    <th>Statut</th>
+                    <th>Techniciens</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- VEHICULES -->
+        <div id="vehicles-tab" class="tab-content">
+          <div class="form-section">
+            <h2><i class="fas fa-plus"></i> Nouveau véhicule</h2>
+            <form id="vehicle-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Immatriculation *</label
+                  ><input id="veh-immat" required />
+                </div>
+                <div class="form-group">
+                  <label>Modèle</label><input id="veh-modele" />
+                </div>
+                <div class="form-group">
+                  <label>Couleur</label><input id="veh-couleur" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Propriétaire</label><input id="veh-proprio" />
+                </div>
+                <div class="form-group">
+                  <label>Téléphone</label><input id="veh-tel" />
+                </div>
+                <div class="form-group">
+                  <label>Photo (option)</label
+                  ><input type="file" id="veh-photo" accept="image/*" />
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary">Enregistrer</button>
+            </form>
+          </div>
+          <div class="form-section">
+            <h2><i class="fas fa-list"></i> Liste des véhicules</h2>
+            <div style="overflow-x: auto">
+              <table class="data-table" id="vehicles-table">
+                <thead>
+                  <tr>
+                    <th>Immat.</th>
+                    <th>Modèle</th>
+                    <th>Propriétaire</th>
+                    <th>Photo</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TRAVAUX -->
+        <div id="works-tab" class="tab-content">
+          <div class="form-section">
+            <h2><i class="fas fa-brush"></i> Nouveau travail</h2>
+            <form id="work-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Véhicule (immat.)</label
+                  ><input
+                    list="veh-list-datalist"
+                    id="work-immat"
+                    placeholder="AA-123-BC"
+                    required
+                  /><datalist id="veh-list-datalist"></datalist>
+                </div>
+                <div class="form-group">
+                  <label>Type travaux</label
+                  ><select id="work-type">
+                    <option>Peinture</option>
+                    <option>Tôlerie</option>
+                    <option>Peinture+Tôlerie</option>
+                    <option>Mécanique</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Date entrée</label
+                  ><input type="date" id="work-date-entree" required />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Date sortie prévue</label
+                  ><input type="date" id="work-date-sortie" />
+                </div>
+                <div class="form-group">
+                  <label>Statut</label
+                  ><select id="work-statut">
+                    <option>en cours</option>
+                    <option>terminé</option>
+                    <option>en attente</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Techniciens (sélection multiple)</label
+                  ><select id="work-techs" multiple size="3">
+                    <option>Junior</option>
+                    <option>Mohamed</option>
+                    <option>Alassane</option>
+                    <option>Ibrahim</option>
+                    <option>William</option>
+                    <option>Joel</option></select
+                  ><small>Ctrl+clic</small>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Observations</label
+                  ><textarea id="work-obs" rows="2"></textarea>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary">
+                Ajouter travail
+              </button>
+            </form>
+          </div>
+          <div class="form-section">
+            <h2><i class="fas fa-tasks"></i> Suivi des travaux</h2>
+            <div style="overflow-x: auto">
+              <table class="data-table" id="works-table">
+                <thead>
+                  <tr>
+                    <th>Véhicule</th>
+                    <th>Type</th>
+                    <th>Date entrée</th>
+                    <th>Statut</th>
+                    <th>Techniciens</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- SINISTRES -->
+        <div id="sinistres-tab" class="tab-content">
+          <div class="form-section">
+            <h2><i class="fas fa-plus-circle"></i> Nouveau sinistre</h2>
+            <form id="sinistre-form">
+              <input type="hidden" id="sinistre-id" />
+              <div class="form-row">
+                <div class="form-group">
+                  <label>N° sinistre *</label><input id="sin-numero" required />
+                </div>
+                <div class="form-group">
+                  <label>Assuré</label><input id="sin-assure" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Véhicule (immat.)</label
+                  ><input
+                    list="veh-list-datalist"
+                    id="sin-immat"
+                    placeholder="AA-123-BC"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>Type véhicule</label><input id="sin-type" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Assureur</label><input id="sin-assureur" />
+                </div>
+                <div class="form-group">
+                  <label>Cabinets expert</label
+                  ><select id="sin-cabinets" multiple>
+                    <option>LCA</option>
+                    <option>PARACLET</option>
+                    <option>AMON</option>
+                    <option>BCA</option>
+                    <option>ATLANTIQUE</option>
+                    <option>SGA</option></select
+                  ><small>Ctrl+clic</small>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Date sinistre</label
+                  ><input type="date" id="sin-date-sinistre" />
+                </div>
+                <div class="form-group">
+                  <label>Date expertise</label
+                  ><input type="date" id="sin-date-expertise" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Montant estimé (FCFA)</label
+                  ><input type="number" id="sin-montant" />
+                </div>
+                <div class="form-group">
+                  <label>Statut</label
+                  ><select id="sin-statut">
+                    <option>en attente rapport</option>
+                    <option>expertise</option>
+                    <option>devis</option>
+                    <option>accord</option>
+                    <option>réparation</option>
+                    <option>clos</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Observations</label
+                  ><textarea id="sin-obs" rows="2"></textarea>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary">
+                Enregistrer sinistre
+              </button>
+            </form>
+          </div>
+          <div class="form-section">
+            <h2><i class="fas fa-filter"></i> Filtres sinistres</h2>
+            <div class="form-row">
+              <div class="form-group">
+                <input
+                  type="text"
+                  id="filter-sin-num"
+                  placeholder="N° sinistre"
+                />
+              </div>
+              <div class="form-group">
+                <input
+                  type="text"
+                  id="filter-sin-immat"
+                  placeholder="Immatriculation"
+                />
+              </div>
+              <div class="form-group">
+                <select id="filter-sin-statut">
+                  <option value="">Tous statuts</option>
+                  <option>en attente rapport</option>
+                  <option>expertise</option>
+                  <option>réparation</option>
+                  <option>clos</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <button id="apply-sin-filter" class="btn">Filtrer</button>
+              </div>
+            </div>
+          </div>
+          <div class="form-section">
+            <h2><i class="fas fa-table"></i> Liste des sinistres</h2>
+            <div style="overflow-x: auto">
+              <table class="data-table" id="sinistres-table">
+                <thead>
+                  <tr>
+                    <th>N° sinistre</th>
+                    <th>Assuré</th>
+                    <th>Véhicule</th>
+                    <th>Assureur</th>
+                    <th>Statut</th>
+                    <th>Montant</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHOTOS & DOCUMENTS (attachés aux sinistres) -->
+        <div id="photos-tab" class="tab-content">
+          <div class="form-section">
+            <h2><i class="fas fa-folder-open"></i> Documents par sinistre</h2>
+            <div class="form-group">
+              <label>Sélectionner un sinistre</label
+              ><select id="doc-sinistre-select">
+                <option value="">-- Choisir un sinistre --</option>
+              </select>
+            </div>
+            <div id="documents-area" style="margin-top: 20px">
+              <div class="photo-grid" id="documents-gallery"></div>
+              <div class="flex-buttons" style="margin-top: 15px">
+                <button id="add-doc-btn" class="btn btn-primary">
+                  <i class="fas fa-upload"></i> Ajouter photo/document
+                </button>
+                <input
+                  type="file"
+                  id="doc-file-input"
+                  accept="image/*,application/pdf"
+                  style="display: none"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RECHERCHE -->
+        <div id="search-tab" class="tab-content">
+          <div class="form-section">
+            <h2><i class="fas fa-search"></i> Recherche avancée</h2>
+            <div class="search-filters">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Immatriculation</label
+                  ><input id="search-immat" placeholder="AA-123-BC" />
+                </div>
+                <div class="form-group">
+                  <label>N° sinistre</label
+                  ><input id="search-sin-num" placeholder="SIN-001" />
+                </div>
+                <div class="form-group">
+                  <label>Assureur</label><input id="search-assureur" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Statut sinistre</label
+                  ><select id="search-sin-statut">
+                    <option value="">Tous</option>
+                    <option>en attente rapport</option>
+                    <option>expertise</option>
+                    <option>réparation</option>
+                    <option>clos</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Type travaux</label
+                  ><select id="search-work-type">
+                    <option value="">Tous</option>
+                    <option>Peinture</option>
+                    <option>Tôlerie</option>
+                    <option>Mécanique</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <button id="do-search" class="btn btn-primary">
+                    Rechercher
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-section">
+            <h2><i class="fas fa-list"></i> Résultats</h2>
+            <div id="search-results-container"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="edit-vehicle-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span>Modifier véhicule</span><span class="close-modal">&times;</span>
+        </div>
+        <form id="edit-vehicle-form">
+          <input type="hidden" id="edit-veh-id" />
+          <div class="form-group">
+            <label>Immatriculation</label><input id="edit-veh-immat" required />
+          </div>
+          <div class="form-group">
+            <label>Modèle</label><input id="edit-veh-modele" />
+          </div>
+          <div class="form-group">
+            <label>Propriétaire</label><input id="edit-veh-proprio" />
+          </div>
+          <div class="form-group">
+            <label>Téléphone</label><input id="edit-veh-tel" />
+          </div>
+          <div class="flex-buttons">
+            <button type="submit" class="btn btn-primary">Mettre à jour</button
+            ><button type="button" class="btn close-modal">Annuler</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div id="edit-work-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span>Modifier travail</span><span class="close-modal">&times;</span>
+        </div>
+        <form id="edit-work-form">
+          <input type="hidden" id="edit-work-id" />
+          <div class="form-group">
+            <label>Type travaux</label><input id="edit-work-type" />
+          </div>
+          <div class="form-group">
+            <label>Statut</label
+            ><select id="edit-work-statut">
+              <option>en cours</option>
+              <option>terminé</option>
+              <option>en attente</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Observations</label><textarea id="edit-work-obs"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary">Modifier</button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // ---------- DATA ----------
+      let vehicles = JSON.parse(localStorage.getItem("hr_vehicles")) || [];
+      let works = JSON.parse(localStorage.getItem("hr_works")) || [];
+      let sinistres = JSON.parse(localStorage.getItem("hr_sinistres")) || [];
+      let documents = JSON.parse(localStorage.getItem("hr_documents")) || {}; // { sinistreId: [ {id, name, type, dataUrl, date} ] }
+
+      function saveAll() {
+        localStorage.setItem("hr_vehicles", JSON.stringify(vehicles));
+        localStorage.setItem("hr_works", JSON.stringify(works));
+        localStorage.setItem("hr_sinistres", JSON.stringify(sinistres));
+        localStorage.setItem("hr_documents", JSON.stringify(documents));
+      }
+
+      function showToast(msg) {
+        let t = document.getElementById("toast-msg");
+        t.innerText = msg;
+        t.style.transform = "translateX(0)";
+        setTimeout(() => (t.style.transform = "translateX(150%)"), 3000);
+      }
+      function genId() {
+        return Date.now() + "-" + Math.random().toString(36).substr(2, 8);
+      }
+
+      // helpers
+      function getVehicleByImmat(immat) {
+        return vehicles.find((v) => v.immatriculation === immat);
+      }
+      window.addEventListener("beforeunload", () => {
+        const data = { vehicles, works, sinistres, documents };
+        localStorage.setItem("hr_backup_auto", JSON.stringify(data));
+      });
+      // ---------- RENDER VEHICULES ----------
+      function renderVehicles() {
+        let tbody = document.querySelector("#vehicles-table tbody");
+        if (!tbody) return;
+        tbody.innerHTML = "";
+        vehicles.forEach((v) => {
+          let photoHtml = v.photo
+            ? `<img src="${v.photo}" style="width:45px;height:45px;object-fit:cover;border-radius:12px;">`
+            : "—";
+          let row = `<tr><td>${v.immatriculation}</td><td>${v.modele || ""}</td><td>${v.proprietaire || ""}</td><td>${photoHtml}</td><td><button class="btn-edit" onclick="openEditVehicle('${v.id}')">✏️</button> <button class="btn-danger" onclick="deleteVehicle('${v.id}')">🗑️</button></td></tr>`;
+          tbody.innerHTML += row;
+        });
+        // update datalist
+        let datalist = document.getElementById("veh-list-datalist");
+        datalist.innerHTML = "";
+        vehicles.forEach((v) => {
+          let opt = document.createElement("option");
+          opt.value = v.immatriculation;
+          datalist.appendChild(opt);
+        });
+        document.getElementById("stat-vehicules").innerText = vehicles.length;
+      }
+
+      window.openEditVehicle = (id) => {
+        let v = vehicles.find((v) => v.id === id);
+        if (v) {
+          document.getElementById("edit-veh-id").value = v.id;
+          document.getElementById("edit-veh-immat").value = v.immatriculation;
+          document.getElementById("edit-veh-modele").value = v.modele || "";
+          document.getElementById("edit-veh-proprio").value =
+            v.proprietaire || "";
+          document.getElementById("edit-veh-tel").value = v.telephone || "";
+          document.getElementById("edit-vehicle-modal").style.display = "flex";
+        }
+      };
+      document
+        .getElementById("edit-vehicle-form")
+        ?.addEventListener("submit", (e) => {
+          e.preventDefault();
+          let id = document.getElementById("edit-veh-id").value;
+          let idx = vehicles.findIndex((v) => v.id === id);
+          if (idx !== -1) {
+            vehicles[idx].immatriculation = document
+              .getElementById("edit-veh-immat")
+              .value.trim()
+              .toUpperCase();
+            vehicles[idx].modele =
+              document.getElementById("edit-veh-modele").value;
+            vehicles[idx].proprietaire =
+              document.getElementById("edit-veh-proprio").value;
+            vehicles[idx].telephone =
+              document.getElementById("edit-veh-tel").value;
+            saveAll();
+            renderVehicles();
+            document.getElementById("edit-vehicle-modal").style.display =
+              "none";
+            showToast("Véhicule modifié");
+          }
+        });
+      window.deleteVehicle = (id) => {
+        if (
+          confirm(
+            "Supprimer ce véhicule ? Les travaux et sinistres liés seront orphelins.",
+          )
+        ) {
+          vehicles = vehicles.filter((v) => v.id !== id);
+          saveAll();
+          renderVehicles();
+          renderWorks();
+          renderSinistres();
+          updateDashboard();
+        }
+      };
+      document
+        .getElementById("vehicle-form")
+        ?.addEventListener("submit", (e) => {
+          e.preventDefault();
+          let immat = document
+            .getElementById("veh-immat")
+            .value.trim()
+            .toUpperCase();
+          if (!immat) return showToast("Immatriculation requise");
+          let photoFile = document.getElementById("veh-photo").files[0];
+          let processSave = (photoUrl) => {
+            vehicles.push({
+              id: genId(),
+              immatriculation: immat,
+              modele: document.getElementById("veh-modele").value,
+              couleur: document.getElementById("veh-couleur").value,
+              proprietaire: document.getElementById("veh-proprio").value,
+              telephone: document.getElementById("veh-tel").value,
+              photo: photoUrl || "",
+            });
+            saveAll();
+            renderVehicles();
+            document.getElementById("vehicle-form").reset();
+            showToast("Véhicule ajouté");
+          };
+          if (photoFile) {
+            let reader = new FileReader();
+            reader.onload = (ev) => processSave(ev.target.result);
+            reader.readAsDataURL(photoFile);
+          } else processSave("");
+        });
+
+      // ---------- TRAVAUX ----------
+      function renderWorks() {
+        let tbody = document.querySelector("#works-table tbody");
+        if (!tbody) return;
+        tbody.innerHTML = "";
+        works.forEach((w) => {
+          let veh = getVehicleByImmat(w.immatriculation) || {
+            immatriculation: w.immatriculation,
+          };
+          let row = `<tr><td>${veh.immatriculation}</td><td>${w.type_travaux}</td><td>${w.date_entree}</td><td><span class="status-badge ${w.statut === "terminé" ? "status-termine" : w.statut === "en cours" ? "status-en-cours" : "status-ouvert"}">${w.statut}</span></td><td>${(w.techniciens || []).join(", ")}</td><td><button onclick="editWork('${w.id}')">✏️</button> <button onclick="deleteWork('${w.id}')">🗑️</button></td></tr>`;
+          tbody.innerHTML += row;
+        });
+        updateDashboard();
+      }
+      document.getElementById("work-form")?.addEventListener("submit", (e) => {
+        e.preventDefault();
+        let immat = document
+          .getElementById("work-immat")
+          .value.trim()
+          .toUpperCase();
+        if (!immat) return showToast("Immatriculation requise");
+        let techs = Array.from(
+          document.getElementById("work-techs").selectedOptions,
+        ).map((o) => o.value);
+        works.push({
+          id: genId(),
+          immatriculation: immat,
+          type_travaux: document.getElementById("work-type").value,
+          date_entree: document.getElementById("work-date-entree").value,
+          date_sortie: document.getElementById("work-date-sortie").value,
+          statut: document.getElementById("work-statut").value,
+          techniciens: techs,
+          observations: document.getElementById("work-obs").value,
+        });
+        saveAll();
+        renderWorks();
+        document.getElementById("work-form").reset();
+        showToast("Travail ajouté");
+      });
+      window.editWork = (id) => {
+        let w = works.find((w) => w.id === id);
+        if (w) {
+          document.getElementById("edit-work-id").value = w.id;
+          document.getElementById("edit-work-type").value = w.type_travaux;
+          document.getElementById("edit-work-statut").value = w.statut;
+          document.getElementById("edit-work-obs").value = w.observations || "";
+          document.getElementById("edit-work-modal").style.display = "flex";
+        }
+      };
+      document
+        .getElementById("edit-work-form")
+        ?.addEventListener("submit", (e) => {
+          e.preventDefault();
+          let id = document.getElementById("edit-work-id").value;
+          let idx = works.findIndex((w) => w.id === id);
+          if (idx !== -1) {
+            works[idx].type_travaux =
+              document.getElementById("edit-work-type").value;
+            works[idx].statut =
+              document.getElementById("edit-work-statut").value;
+            works[idx].observations =
+              document.getElementById("edit-work-obs").value;
+            saveAll();
+            renderWorks();
+            document.getElementById("edit-work-modal").style.display = "none";
+            showToast("Travail modifié");
+          }
+        });
+      window.deleteWork = (id) => {
+        if (confirm("Supprimer ce travail ?")) {
+          works = works.filter((w) => w.id !== id);
+          saveAll();
+          renderWorks();
+          showToast("Supprimé");
+        }
+      };
+
+      // ---------- SINISTRES ----------
+      function renderSinistres(filteredArr = null) {
+        let data = filteredArr || sinistres;
+        let tbody = document.querySelector("#sinistres-table tbody");
+        if (!tbody) return;
+        tbody.innerHTML = "";
+        data.forEach((s) => {
+          let row = `<tr><td>${s.numero_sinistre}</td><td>${s.assure || ""}</td><td>${s.immatriculation}</td><td>${s.assureur || ""}</td><td><span class="status-badge">${s.statut}</span></td><td>${(s.montant || 0).toLocaleString()}</td><td><button onclick="editSinistre('${s.id}')">✏️</button> <button onclick="deleteSinistre('${s.id}')">🗑️</button></td></tr>`;
+          tbody.innerHTML += row;
+        });
+        updateDashboard();
+        fillSinistreSelect();
+      }
+      window.editSinistre = (id) => {
+        let s = sinistres.find((s) => s.id === id);
+        if (s) {
+          document.getElementById("sinistre-id").value = s.id;
+          document.getElementById("sin-numero").value = s.numero_sinistre;
+          document.getElementById("sin-assure").value = s.assure || "";
+          document.getElementById("sin-immat").value = s.immatriculation || "";
+          document.getElementById("sin-type").value = s.type || "";
+          document.getElementById("sin-assureur").value = s.assureur || "";
+          document.getElementById("sin-date-sinistre").value =
+            s.date_sinistre || "";
+          document.getElementById("sin-date-expertise").value =
+            s.date_expertise || "";
+          document.getElementById("sin-montant").value = s.montant || "";
+          document.getElementById("sin-statut").value = s.statut;
+          document.getElementById("sin-obs").value = s.observations || "";
+          let cabinetSelect = document.getElementById("sin-cabinets");
+          Array.from(cabinetSelect.options).forEach(
+            (opt) => (opt.selected = s.cabinet_expert?.includes(opt.value)),
+          );
+          // scroll
+          document.getElementById("sinistres-tab").scrollIntoView();
+        }
+      };
+      window.deleteSinistre = (id) => {
+        if (confirm("Supprimer ce sinistre ?")) {
+          sinistres = sinistres.filter((s) => s.id !== id);
+          delete documents[id];
+          saveAll();
+          renderSinistres();
+          showToast("Sinistre supprimé");
+        }
+      };
+      document
+        .getElementById("sinistre-form")
+        ?.addEventListener("submit", (e) => {
+          e.preventDefault();
+          let id = document.getElementById("sinistre-id").value;
+          let cabinets = Array.from(
+            document.getElementById("sin-cabinets").selectedOptions,
+          ).map((o) => o.value);
+          let sinData = {
+            id: id || genId(),
+            numero_sinistre: document.getElementById("sin-numero").value,
+            assure: document.getElementById("sin-assure").value,
+            immatriculation: document
+              .getElementById("sin-immat")
+              .value.toUpperCase(),
+            type: document.getElementById("sin-type").value,
+            assureur: document.getElementById("sin-assureur").value,
+            cabinet_expert: cabinets,
+            date_sinistre: document.getElementById("sin-date-sinistre").value,
+            date_expertise: document.getElementById("sin-date-expertise").value,
+            montant:
+              parseFloat(document.getElementById("sin-montant").value) || 0,
+            statut: document.getElementById("sin-statut").value,
+            observations: document.getElementById("sin-obs").value,
+            date_creation: new Date().toISOString(),
+          };
+          if (id) {
+            let idx = sinistres.findIndex((s) => s.id === id);
+            if (idx !== -1) sinistres[idx] = { ...sinistres[idx], ...sinData };
+          } else sinistres.push(sinData);
+          saveAll();
+          renderSinistres();
+          document.getElementById("sinistre-form").reset();
+          document.getElementById("sinistre-id").value = "";
+          showToast("Sinistre enregistré");
+        });
+      document
+        .getElementById("apply-sin-filter")
+        ?.addEventListener("click", () => {
+          let num = document
+            .getElementById("filter-sin-num")
+            .value.toLowerCase();
+          let immat = document
+            .getElementById("filter-sin-immat")
+            .value.toLowerCase();
+          let stat = document.getElementById("filter-sin-statut").value;
+          let filtered = sinistres.filter(
+            (s) =>
+              (num === "" || s.numero_sinistre?.toLowerCase().includes(num)) &&
+              (immat === "" ||
+                s.immatriculation?.toLowerCase().includes(immat)) &&
+              (stat === "" || s.statut === stat),
+          );
+          renderSinistres(filtered);
+        });
+
+      // ---------- PHOTOS & DOCS ----------
+      function fillSinistreSelect() {
+        let sel = document.getElementById("doc-sinistre-select");
+        if (!sel) return;
+        sel.innerHTML = '<option value="">-- Choisir un sinistre --</option>';
+        sinistres.forEach((s) => {
+          let opt = document.createElement("option");
+          opt.value = s.id;
+          opt.textContent = `${s.numero_sinistre} - ${s.immatriculation}`;
+          sel.appendChild(opt);
+        });
+      }
+      function renderDocs(sinistreId) {
+        let gallery = document.getElementById("documents-gallery");
+        if (!gallery) return;
+        gallery.innerHTML = "";
+        let docs = documents[sinistreId] || [];
+        if (docs.length === 0) {
+          gallery.innerHTML = "<p>Aucun document pour ce sinistre</p>";
+          return;
+        }
+        docs.forEach((doc) => {
+          let isImg = doc.type.startsWith("image");
+          let card = document.createElement("div");
+          card.className = "photo-card";
+          if (isImg)
+            card.innerHTML = `<img src="${doc.dataUrl}" style="width:100%;height:100%;object-fit:cover"><button onclick="deleteDoc('${sinistreId}','${doc.id}')" style="position:absolute;top:5px;right:5px;background:#ef4444;color:white;border:none;border-radius:50%;width:28px;">✖</button>`;
+          else
+            card.innerHTML = `<div style="background:#e2e8f0;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;"><i class="fas fa-file-pdf fa-2x"></i><span style="font-size:10px;">${doc.name}</span><button onclick="deleteDoc('${sinistreId}','${doc.id}')" style="margin-top:5px;">Supprimer</button></div>`;
+          gallery.appendChild(card);
+        });
+      }
+      window.deleteDoc = (sinId, docId) => {
+        if (documents[sinId])
+          documents[sinId] = documents[sinId].filter((d) => d.id !== docId);
+        if (documents[sinId]?.length === 0) delete documents[sinId];
+        saveAll();
+        renderDocs(sinId);
+        showToast("Document supprimé");
+      };
+      document
+        .getElementById("doc-sinistre-select")
+        ?.addEventListener("change", (e) => {
+          if (e.target.value) renderDocs(e.target.value);
+          else document.getElementById("documents-gallery").innerHTML = "";
+        });
+      document.getElementById("add-doc-btn")?.addEventListener("click", () => {
+        let sinId = document.getElementById("doc-sinistre-select").value;
+        if (!sinId) {
+          showToast("Sélectionnez un sinistre");
+          return;
+        }
+        document.getElementById("doc-file-input").click();
+      });
+      document
+        .getElementById("doc-file-input")
+        ?.addEventListener("change", (e) => {
+          let file = e.target.files[0];
+          if (!file) return;
+          let sinId = document.getElementById("doc-sinistre-select").value;
+          let reader = new FileReader();
+          reader.onload = (ev) => {
+            if (!documents[sinId]) documents[sinId] = [];
+            documents[sinId].push({
+              id: genId(),
+              name: file.name,
+              type: file.type,
+              dataUrl: ev.target.result,
+              date: new Date().toISOString(),
+            });
+            saveAll();
+            renderDocs(sinId);
+            showToast("Document ajouté");
+          };
+          reader.readAsDataURL(file);
+          e.target.value = "";
+        });
+
+      // ---------- RECHERCHE ----------
+      document.getElementById("do-search")?.addEventListener("click", () => {
+        let immat = document
+          .getElementById("search-immat")
+          .value.trim()
+          .toUpperCase();
+        let sinNum = document.getElementById("search-sin-num").value.trim();
+        let assureur = document
+          .getElementById("search-assureur")
+          .value.trim()
+          .toLowerCase();
+        let sinStat = document.getElementById("search-sin-statut").value;
+        let workType = document.getElementById("search-work-type").value;
+        let results = { vehicles: [], works: [], sinistres: [] };
+        if (immat) {
+          results.vehicles = vehicles.filter((v) =>
+            v.immatriculation.includes(immat),
+          );
+          results.works = works.filter((w) =>
+            w.immatriculation.includes(immat),
+          );
+          results.sinistres = sinistres.filter((s) =>
+            s.immatriculation.includes(immat),
+          );
+        }
+        if (sinNum)
+          results.sinistres = sinistres.filter((s) =>
+            s.numero_sinistre?.toLowerCase().includes(sinNum.toLowerCase()),
+          );
+        if (assureur)
+          results.sinistres = results.sinistres.filter((s) =>
+            s.assureur?.toLowerCase().includes(assureur),
+          );
+        if (sinStat)
+          results.sinistres = results.sinistres.filter(
+            (s) => s.statut === sinStat,
+          );
+        if (workType)
+          results.works = results.works.filter(
+            (w) => w.type_travaux === workType,
+          );
+        let container = document.getElementById("search-results-container");
+        container.innerHTML = `<h3>Véhicules (${results.vehicles.length})</h3><ul>${results.vehicles.map((v) => `<li>${v.immatriculation} - ${v.modele}</li>`).join("")}</ul>
+                               <h3>Travaux (${results.works.length})</h3><ul>${results.works.map((w) => `<li>${w.immatriculation} - ${w.type_travaux} (${w.statut})</li>`).join("")}</ul>
+                               <h3>Sinistres (${results.sinistres.length})</h3><ul>${results.sinistres.map((s) => `<li>${s.numero_sinistre} - ${s.immatriculation} - ${s.statut}</li>`).join("")}</ul>`;
+      });
+
+      // ---------- DASHBOARD & SYNCHRO ----------
+      function updateDashboard() {
+        let travauxEnCours = works.filter(
+          (w) => w.statut === "en cours",
+        ).length;
+        let sinistresOuverts = sinistres.filter(
+          (s) => s.statut !== "clos",
+        ).length;
+        let attenteRapport = sinistres.filter(
+          (s) => s.statut === "en attente rapport",
+        ).length;
+        document.getElementById("stat-travaux-en-cours").innerText =
+          travauxEnCours;
+        document.getElementById("stat-sinistres-ouverts").innerText =
+          sinistresOuverts;
+        document.getElementById("stat-attente-rapport").innerText =
+          attenteRapport;
+        // derniers travaux
+        let lastWorks = [...works]
+          .sort((a, b) => new Date(b.date_entree) - new Date(a.date_entree))
+          .slice(0, 5);
+        let tbodyDash = document.querySelector("#dashboard-last-works tbody");
+        if (tbodyDash) {
+          tbodyDash.innerHTML = "";
+          lastWorks.forEach((w) => {
+            let veh = getVehicleByImmat(w.immatriculation) || {
+              immatriculation: w.immatriculation,
+            };
+            tbodyDash.innerHTML += `<tr><td>${veh.immatriculation}</td><td>${w.type_travaux}</td><td>${w.statut}</td><td>${(w.techniciens || []).join(",")}</td><td>${w.date_entree}</td></tr>`;
+          });
+        }
+      }
+
+      // EXPORT / IMPORT
+      document.getElementById("export-excel")?.addEventListener("click", () => {
+        let ws1 = XLSX.utils.json_to_sheet(
+          vehicles.map((v) => ({
+            Immatriculation: v.immatriculation,
+            Modele: v.modele,
+            Proprietaire: v.proprietaire,
+            Telephone: v.telephone,
+          })),
+        );
+        let ws2 = XLSX.utils.json_to_sheet(
+          works.map((w) => ({
+            Immatriculation: w.immatriculation,
+            Type: w.type_travaux,
+            Date_entree: w.date_entree,
+            Statut: w.statut,
+            Techniciens: w.techniciens?.join(","),
+          })),
+        );
+        let ws3 = XLSX.utils.json_to_sheet(
+          sinistres.map((s) => ({
+            Numero: s.numero_sinistre,
+            Assure: s.assure,
+            Vehicule: s.immatriculation,
+            Assureur: s.assureur,
+            Statut: s.statut,
+            Montant: s.montant,
+          })),
+        );
+        let wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws1, "Vehicules");
+        XLSX.utils.book_append_sheet(wb, ws2, "Travaux");
+        XLSX.utils.book_append_sheet(wb, ws3, "Sinistres");
+        XLSX.writeFile(
+          wb,
+          `hr_motors_${new Date().toISOString().slice(0, 10)}.xlsx`,
+        );
+        showToast("Export Excel réussi");
+      });
+      document
+        .getElementById("export-pdf")
+        ?.addEventListener("click", async () => {
+          const { jsPDF } = window.jspdf;
+          let doc = new jsPDF();
+          doc.text("Rapport HR Motors", 14, 15);
+          doc.text(`Généré le ${new Date().toLocaleDateString()}`, 14, 25);
+          doc.autoTable({
+            startY: 35,
+            head: [["Immat", "Modèle", "Propriétaire"]],
+            body: vehicles.map((v) => [
+              v.immatriculation,
+              v.modele || "",
+              v.proprietaire || "",
+            ]),
+          });
+          let y = doc.lastAutoTable.finalY + 10;
+          doc.autoTable({
+            startY: y,
+            head: [["Immat", "Travaux", "Statut"]],
+            body: works.map((w) => [
+              w.immatriculation,
+              w.type_travaux,
+              w.statut,
+            ]),
+          });
+          y = doc.lastAutoTable.finalY + 10;
+          doc.autoTable({
+            startY: y,
+            head: [["N° sinistre", "Véhicule", "Statut"]],
+            body: sinistres.map((s) => [
+              s.numero_sinistre,
+              s.immatriculation,
+              s.statut,
+            ]),
+          });
+          doc.save(`hr_report_${new Date().toISOString().slice(0, 10)}.pdf`);
+          showToast("PDF généré");
+        });
+      document
+        .getElementById("import-json-file")
+        ?.addEventListener("change", (e) => {
+          let file = e.target.files[0];
+          if (!file) return;
+          let reader = new FileReader();
+          reader.onload = (ev) => {
+            try {
+              let data = JSON.parse(ev.target.result);
+              if (data.vehicles) vehicles = data.vehicles;
+              if (data.works) works = data.works;
+              if (data.sinistres) sinistres = data.sinistres;
+              if (data.documents) documents = data.documents;
+              saveAll();
+              renderVehicles();
+              renderWorks();
+              renderSinistres();
+              fillSinistreSelect();
+              updateDashboard();
+              showToast("Import JSON réussi");
+            } catch (e) {
+              showToast("Fichier JSON invalide");
+            }
+          };
+          reader.readAsText(file);
+          e.target.value = "";
+        });
+      document
+        .getElementById("share-data")
+        ?.addEventListener("click", async () => {
+          let exportObj = { vehicles, works, sinistres, documents };
+          let jsonStr = JSON.stringify(exportObj);
+          if (navigator.share) {
+            try {
+              await navigator.share({
+                title: "Données HR Motors",
+                text: "Sauvegarde complète",
+                files: [
+                  new File([jsonStr], "hr_backup.json", {
+                    type: "application/json",
+                  }),
+                ],
+              });
+              showToast("Partage lancé");
+            } catch (e) {
+              showToast("Partage annulé");
+            }
+          } else {
+            navigator.clipboard.writeText(jsonStr);
+            showToast("Données copiées dans le presse-papier");
+          }
+        });
+
+      // ---------- NAVIGATION ----------
+      function switchTab(tab) {
+        document
+          .querySelectorAll(".tab-content")
+          .forEach((t) => t.classList.remove("active"));
+        document.getElementById(`${tab}-tab`).classList.add("active");
+        document
+          .querySelectorAll(".menu-item")
+          .forEach((i) => i.classList.remove("active"));
+        document
+          .querySelector(`.menu-item[data-tab="${tab}"]`)
+          .classList.add("active");
+        if (tab === "vehicles") renderVehicles();
+        if (tab === "works") renderWorks();
+        if (tab === "sinistres") renderSinistres();
+        if (tab === "photos") fillSinistreSelect();
+        if (tab === "dashboard") updateDashboard();
+      }
+      document
+        .querySelectorAll(".menu-item")
+        .forEach((item) =>
+          item.addEventListener("click", () => switchTab(item.dataset.tab)),
+        );
+      document
+        .querySelector(".mobile-menu-btn")
+        ?.addEventListener("click", () =>
+          document.querySelector(".sidebar").classList.toggle("open"),
+        );
+      document
+        .querySelectorAll(".close-modal")
+        .forEach((btn) =>
+          btn.addEventListener("click", () =>
+            document
+              .querySelectorAll(".modal")
+              .forEach((m) => (m.style.display = "none")),
+          ),
+        );
+      window.addEventListener("click", (e) => {
+        if (e.target.classList?.contains("modal"))
+          e.target.style.display = "none";
+      });
+
+      // initial load
+      renderVehicles();
+      renderWorks();
+      renderSinistres();
+      updateDashboard();
+      fillSinistreSelect();
+    </script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("/sw.js")
+          .then((reg) => console.log("SW enregistré", reg))
+          .catch((err) => console.log("Erreur SW", err));
+      }
+    </script>
+  </body>
+</html>
