@@ -1465,11 +1465,18 @@
         if (tab === "photos") fillSinistreSelect();
         if (tab === "dashboard") updateDashboard();
       }
-      document
-        .querySelectorAll(".menu-item")
-        .forEach((item) =>
-          item.addEventListener("click", () => switchTab(item.dataset.tab)),
-        );
+      document.querySelectorAll('.menu-item').forEach(item => {
+    item.addEventListener('click', () => {
+        const tab = item.dataset.tab;
+        switchTab(tab);
+        
+        // Fermer la sidebar sur mobile après sélection
+        const sidebar = document.querySelector('.sidebar');
+        if (window.innerWidth <= 768) {
+            sidebar.classList.remove('open');
+        }
+    });
+});
       document
         .querySelector(".mobile-menu-btn")
         ?.addEventListener("click", () =>
