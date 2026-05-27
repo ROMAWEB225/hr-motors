@@ -1502,6 +1502,12 @@
       renderSinistres();
       updateDashboard();
       fillSinistreSelect();
+
+      document.querySelector('.main-content').addEventListener('click', () => {
+    if (window.innerWidth <= 768) {
+        document.querySelector('.sidebar').classList.remove('open');
+    }
+});
     </script>
     <script>
       if ("serviceWorker" in navigator) {
