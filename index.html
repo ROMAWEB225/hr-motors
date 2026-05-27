@@ -111,6 +111,7 @@
                     <div class="flex-buttons">
                         <button id="export-excel" class="btn btn-success"><i class="fas fa-file-excel"></i> Excel complet</button>
                         <button id="export-pdf" class="btn btn-danger"><i class="fas fa-file-pdf"></i> PDF récapitulatif</button>
+                        <button id="export-json" class="btn btn-primary"><i class="fas fa-download"></i> Exporter JSON</button>   <!-- NOUVEAU -->
                         <label for="import-json-file" class="btn btn-primary"><i class="fas fa-upload"></i> Importer JSON</label>
                         <input type="file" id="import-json-file" accept=".json" style="display:none">
                         <button id="share-data" class="btn btn-primary"><i class="fas fa-share-alt"></i> Partager</button>
@@ -680,6 +681,22 @@
         doc.save(`hr_report_${new Date().toISOString().slice(0,10)}.pdf`);
         showToast("PDF généré");
     });
+
+    document.getElementById('export-json')?.addEventListener('click', () => {
+    let exportObj = { vehicles, works, sinistres, documents };
+    let jsonStr = JSON.stringify(exportObj, null, 2);
+    let fileName = `hr_motors_backup_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.json`;
+    const blob = new Blob([jsonStr], {type: 'application/json'});
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+    showToast("✅ Sauvegarde JSON téléchargée");
+});
+
     document.getElementById('import-json-file')?.addEventListener('change', (e) => {
         let file = e.target.files[0];
         if(!file) return;
@@ -701,11 +718,52 @@
     });
     document.getElementById('share-data')?.addEventListener('click', async () => {
         let exportObj = { vehicles, works, sinistres, documents };
-        let jsonStr = JSON.stringify(exportObj);
-        if(navigator.share) {
-            try { await navigator.share({ title: "Données HR Motors", text: "Sauvegarde complète", files: [new File([jsonStr], "hr_backup.json", {type:"application/json"})] }); showToast("Partage lancé"); } catch(e) { showToast("Partage annulé"); }
-        } else { navigator.clipboard.writeText(jsonStr); showToast("Données copiées dans le presse-papier"); }
+        let jsonStr = JSON.stringify(exportObj, null, 2);
+        let date = new Date().toISOString().slice(0,19).replace(/:/g, '-');
+        let fileName = `hr_backup_${date}.json`;
+
+          // Méthode 1 : partage via Web Share (si disponible et accepte les fichiers)
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [new File([jsonStr], fileName, {type: 'application/json'})] })) {
+        try {
+            const file = new File([jsonStr], fileName, { type: 'application/json' });
+            await navigator.share({
+                title: 'Sauvegarde HR Motors',
+                text: 'Voici votre fichier de sauvegarde',
+                files: [file]
+            });
+            showToast("📤 Fichier partagé !");
+        } catch (err) {
+            if (err.name !== 'AbortError') {
+                showToast("❌ Échec du partage, copie dans presse-papier");
+                copyToClipboard(jsonStr, fileName);
+            } else {
+                showToast("Partage annulé");
+            }
+        }
+    } 
+    // Méthode 2 : téléchargement direct (fallback)
+    else {
+        downloadJson(jsonStr, fileName);
+        showToast("📁 Fichier JSON téléchargé (sauvegarde locale)");
+    }
     });
+
+    function downloadJson(content, fileName) {
+    const blob = new Blob([content], {type: 'application/json'});
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+}
+
+function copyToClipboard(text, fileName) {
+    navigator.clipboard.writeText(text).then(() => {
+        showToast(`✅ Données copiées (collez dans un fichier nommé ${fileName})`);
+    }).catch(() => showToast("❌ Impossible de copier"));
+}
 
     // initial load
     renderVehicles(); renderWorks(); renderSinistres(); updateDashboard(); fillSinistreSelect();
