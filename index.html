@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>HR Motors – Gestion complète atelier & sinistres</title>
+    <title>HR Motors – Gestion sinistres & atelier</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -83,7 +83,7 @@
 
 <div class="app">
     <aside class="sidebar">
-        <div class="logo"><i class="fas fa-car-crash"></i> NTR-App </div>
+        <div class="logo"><i class="fas fa-car-crash"></i> HR Motors</div>
         <div class="menu-item active" data-tab="dashboard"><i class="fas fa-chart-line"></i> Tableau de bord</div>
         <div class="menu-item" data-tab="vehicles"><i class="fas fa-car"></i> Véhicules</div>
         <div class="menu-item" data-tab="works"><i class="fas fa-tools"></i> Travaux</div>
@@ -94,7 +94,7 @@
 
     <main class="main-content">
         <button class="mobile-menu-btn"><i class="fas fa-bars"></i></button>
-        <div class="header"><h1 id="page-title">HR Motors Gestion </h1><div></div></div>
+        <div class="header"><h1 id="page-title">Gestion atelier & sinistres</h1><div></div></div>
 
         <!-- DASHBOARD -->
         <div id="dashboard-tab" class="tab-content active">
@@ -111,7 +111,7 @@
                     <div class="flex-buttons">
                         <button id="export-excel" class="btn btn-success"><i class="fas fa-file-excel"></i> Excel complet</button>
                         <button id="export-pdf" class="btn btn-danger"><i class="fas fa-file-pdf"></i> PDF récapitulatif</button>
-                        <button id="export-json" class="btn btn-primary"><i class="fas fa-download"></i> Exporter JSON</button>   <!-- NOUVEAU -->
+                        <button id="export-json" class="btn btn-primary"><i class="fas fa-download"></i> Exporter JSON</button>
                         <label for="import-json-file" class="btn btn-primary"><i class="fas fa-upload"></i> Importer JSON</label>
                         <input type="file" id="import-json-file" accept=".json" style="display:none">
                         <button id="share-data" class="btn btn-primary"><i class="fas fa-share-alt"></i> Partager</button>
@@ -120,7 +120,7 @@
             </div>
             <div class="form-section">
                 <h2><i class="fas fa-history"></i> Dernières interventions</h2>
-                <div style="overflow-x:auto"><table class="data-table" id="dashboard-last-works"><thead><tr><th>Véhicule</th><th>Type travaux</th><th>Statut</th><th>Techniciens</th><th>Date</th></tr></thead><tbody></tbody></table></div>
+                <div style="overflow-x:auto"><table class="data-table" id="dashboard-last-works"><thead><tr><th>Véhicule</th><th>Type travaux</th><th>Statut</th><th>Techniciens</th><th>Date</th></td></thead><tbody></tbody></table></div>
             </div>
         </div>
 
@@ -135,7 +135,7 @@
                         <div class="form-group"><label>Couleur</label><input id="veh-couleur"></div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group"><label>Clients</label><input id="veh-proprio"></div>
+                        <div class="form-group"><label>Propriétaire</label><input id="veh-proprio"></div>
                         <div class="form-group"><label>Téléphone</label><input id="veh-tel"></div>
                         <div class="form-group"><label>Photo (option)</label><input type="file" id="veh-photo" accept="image/*"></div>
                     </div>
@@ -169,11 +169,11 @@
             </div>
             <div class="form-section">
                 <h2><i class="fas fa-tasks"></i> Suivi des travaux</h2>
-                <div style="overflow-x:auto"><table class="data-table" id="works-table"><thead><tr><th>Véhicule</th><th>Type</th><th>Date entrée</th><th>Statut</th><th>Techniciens</th><th>Actions</th></td></thead><tbody></tbody></table></div>
+                <div style="overflow-x:auto"><table class="data-table" id="works-table"><thead><tr><th>Véhicule</th><th>Type</th><th>Date entrée</th><th>Statut</th><th>Techniciens</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
             </div>
         </div>
 
-        <!-- SINISTRES -->
+        <!-- SINISTRES (avec nouveaux champs) -->
         <div id="sinistres-tab" class="tab-content">
             <div class="form-section">
                 <h2><i class="fas fa-plus-circle"></i> Nouveau sinistre</h2>
@@ -196,7 +196,15 @@
                         <div class="form-group"><label>Date expertise</label><input type="date" id="sin-date-expertise"></div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group"><label>Montant estimé (FCFA)</label><input type="number" id="sin-montant"></div>
+                        <div class="form-group"><label>Photo avant travaux (personne)</label><input id="sin-photo-avant" placeholder="Nom du photographe"></div>
+                        <div class="form-group"><label>Photo après travaux (personne)</label><input id="sin-photo-apres" placeholder="Nom du photographe"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Date des photos</label><input type="date" id="sin-date-photos"></div>
+                        <div class="form-group"><label>Date de livraison</label><input type="date" id="sin-date-livraison"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Montant estimé (FCFA)</label><input type="text" id="sin-montant" placeholder="ex: 1500000 ou T+P"></div>
                         <div class="form-group"><label>Statut</label><select id="sin-statut"><option>en attente rapport</option><option>expertise</option><option>devis</option><option>accord</option><option>réparation</option><option>clos</option></select></div>
                     </div>
                     <div class="form-row"><div class="form-group"><label>Observations</label><textarea id="sin-obs" rows="2"></textarea></div></div>
@@ -263,510 +271,608 @@
 <div id="edit-work-modal" class="modal"><div class="modal-content"><div class="modal-header"><span>Modifier travail</span><span class="close-modal">&times;</span></div><form id="edit-work-form"><input type="hidden" id="edit-work-id"><div class="form-group"><label>Type travaux</label><input id="edit-work-type"></div><div class="form-group"><label>Statut</label><select id="edit-work-statut"><option>en cours</option><option>terminé</option><option>en attente</option></select></div><div class="form-group"><label>Observations</label><textarea id="edit-work-obs"></textarea></div><button type="submit" class="btn btn-primary">Modifier</button></form></div></div>
 
 <script>
-    // ---------- DATA ----------
-    let vehicles = JSON.parse(localStorage.getItem('hr_vehicles')) || [];
-    let works = JSON.parse(localStorage.getItem('hr_works')) || [];
-    let sinistres = JSON.parse(localStorage.getItem('hr_sinistres')) || [];
-    let documents = JSON.parse(localStorage.getItem('hr_documents')) || {};
+    (function() {
+        // ----- DATA -----
+        let vehicles = JSON.parse(localStorage.getItem('hr_vehicles')) || [];
+        let works = JSON.parse(localStorage.getItem('hr_works')) || [];
+        let sinistres = JSON.parse(localStorage.getItem('hr_sinistres')) || [];
+        let documents = JSON.parse(localStorage.getItem('hr_documents')) || {};
 
-    function saveAll() {
-        localStorage.setItem('hr_vehicles', JSON.stringify(vehicles));
-        localStorage.setItem('hr_works', JSON.stringify(works));
-        localStorage.setItem('hr_sinistres', JSON.stringify(sinistres));
-        localStorage.setItem('hr_documents', JSON.stringify(documents));
-    }
-
-    function showToast(msg) {
-        let t = document.getElementById('toast-msg');
-        t.innerText = msg;
-        t.style.transform = 'translateX(0)';
-        setTimeout(() => t.style.transform = 'translateX(150%)', 3000);
-    }
-    function genId() { return Date.now() + '-' + Math.random().toString(36).substr(2, 8); }
-
-    function getVehicleByImmat(immat) { return vehicles.find(v => v.immatriculation === immat); }
-
-    // ---------- NAVIGATION (avec fermeture mobile corrigée) ----------
-    function switchTab(tabName) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        document.getElementById(`${tabName}-tab`).classList.add('active');
-        document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
-        document.querySelector(`.menu-item[data-tab="${tabName}"]`).classList.add('active');
-        if(tabName === 'vehicles') renderVehicles();
-        if(tabName === 'works') renderWorks();
-        if(tabName === 'sinistres') renderSinistres();
-        if(tabName === 'photos') fillSinistreSelect();
-        if(tabName === 'dashboard') updateDashboard();
-        // Fermer la sidebar sur mobile après avoir cliqué sur un onglet
-        if (window.innerWidth <= 768) {
-            document.querySelector('.sidebar').classList.remove('open');
+        function saveAll() {
+            localStorage.setItem('hr_vehicles', JSON.stringify(vehicles));
+            localStorage.setItem('hr_works', JSON.stringify(works));
+            localStorage.setItem('hr_sinistres', JSON.stringify(sinistres));
+            localStorage.setItem('hr_documents', JSON.stringify(documents));
         }
-    }
 
-    // Gestion du menu hamburger et fermeture au clic extérieur
-    const mobileBtn = document.querySelector('.mobile-menu-btn');
-    const sidebar = document.querySelector('.sidebar');
-    if (mobileBtn) {
-        mobileBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            sidebar.classList.toggle('open');
-        });
-    }
-    // Fermer la sidebar si on clique en dehors (sur le contenu principal, mais pas sur le bouton ni sur la sidebar)
-    document.querySelector('.main-content').addEventListener('click', (e) => {
-        if (window.innerWidth <= 768 && sidebar.classList.contains('open')) {
-            if (!e.target.closest('.mobile-menu-btn') && !e.target.closest('.sidebar')) {
-                sidebar.classList.remove('open');
+        function showToast(msg) {
+            let t = document.getElementById('toast-msg');
+            t.innerText = msg;
+            t.style.transform = 'translateX(0)';
+            setTimeout(() => t.style.transform = 'translateX(150%)', 3000);
+        }
+        function genId() { return Date.now() + '-' + Math.random().toString(36).substr(2, 8); }
+        function getVehicleByImmat(immat) { return vehicles.find(v => v.immatriculation === immat); }
+
+        // ----- RENDERING OPTIMIZED -----
+        function renderVehicles() {
+            let tbody = document.querySelector('#vehicles-table tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            vehicles.forEach(v => {
+                let photoHtml = v.photo ? `<img src="${v.photo}" style="width:45px;height:45px;object-fit:cover;border-radius:12px;">` : '—';
+                let row = `<tr>
+                    <td>${escapeHtml(v.immatriculation)}</td>
+                    <td>${escapeHtml(v.modele || '')}</td>
+                    <td>${escapeHtml(v.proprietaire || '')}</td>
+                    <td>${photoHtml}</td>
+                    <td class="action-buttons">
+                        <button class="btn-edit" onclick="openEditVehicle('${v.id}')">✏️</button>
+                        <button class="btn-danger" onclick="deleteVehicle('${v.id}')">🗑️</button>
+                        <button class="btn-success btn-sm" onclick="addWorkForVehicle('${escapeHtml(v.immatriculation)}')">➕ Travaux</button>
+                    </td>
+                `;
+                tbody.innerHTML += row;
+            });
+            let datalist = document.getElementById('veh-list-datalist');
+            if (datalist) {
+                datalist.innerHTML = '';
+                vehicles.forEach(v => { let opt = document.createElement('option'); opt.value = v.immatriculation; datalist.appendChild(opt); });
             }
+            document.getElementById('stat-vehicules').innerText = vehicles.length;
         }
-    });
 
-    document.querySelectorAll('.menu-item').forEach(item => {
-        item.addEventListener('click', () => switchTab(item.dataset.tab));
-    });
-    document.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', () => document.querySelectorAll('.modal').forEach(m => m.style.display = 'none')));
-    window.addEventListener('click', (e) => { if(e.target.classList?.contains('modal')) e.target.style.display = 'none'; });
-
-    // ---------- RENDER VEHICULES (avec bouton Travaux) ----------
-    function renderVehicles() {
-        let tbody = document.querySelector('#vehicles-table tbody');
-        if(!tbody) return;
-        tbody.innerHTML = '';
-        vehicles.forEach(v => {
-            let photoHtml = v.photo ? `<img src="${v.photo}" style="width:45px;height:45px;object-fit:cover;border-radius:12px;">` : '—';
-            let row = `<td>
-                <td>${v.immatriculation}</td>
-                <td>${v.modele || ''}</td>
-                <td>${v.proprietaire || ''}</td>
-                <td>${photoHtml}</td>
-                <td class="action-buttons">
-                    <button class="btn-edit" onclick="openEditVehicle('${v.id}')">✏️</button>
-                    <button class="btn-danger" onclick="deleteVehicle('${v.id}')">🗑️</button>
-                    <button class="btn-success btn-sm" onclick="addWorkForVehicle('${v.immatriculation}')">➕ Travaux</button>
-                 </td>
-            </tr>`;
-            tbody.innerHTML += row;
-        });
-        let datalist = document.getElementById('veh-list-datalist');
-        datalist.innerHTML = '';
-        vehicles.forEach(v => { let opt = document.createElement('option'); opt.value = v.immatriculation; datalist.appendChild(opt); });
-        document.getElementById('stat-vehicules').innerText = vehicles.length;
-    }
-
-    window.addWorkForVehicle = (immat) => {
-        document.getElementById('work-immat').value = immat;
-        document.getElementById('work-date-entree').value = new Date().toISOString().slice(0,10);
-        switchTab('works');
-        document.querySelector('#works-tab .form-section').scrollIntoView({ behavior: 'smooth' });
-        showToast(`Préparation d'un travail pour ${immat}`);
-    };
-
-    window.openEditVehicle = (id) => {
-        let v = vehicles.find(v => v.id === id);
-        if(v) {
-            document.getElementById('edit-veh-id').value = v.id;
-            document.getElementById('edit-veh-immat').value = v.immatriculation;
-            document.getElementById('edit-veh-modele').value = v.modele || '';
-            document.getElementById('edit-veh-proprio').value = v.proprietaire || '';
-            document.getElementById('edit-veh-tel').value = v.telephone || '';
-            document.getElementById('edit-vehicle-modal').style.display = 'flex';
-        }
-    };
-    document.getElementById('edit-vehicle-form')?.addEventListener('submit', (e) => {
-        e.preventDefault();
-        let id = document.getElementById('edit-veh-id').value;
-        let idx = vehicles.findIndex(v => v.id === id);
-        if(idx !== -1) {
-            vehicles[idx].immatriculation = document.getElementById('edit-veh-immat').value.trim().toUpperCase();
-            vehicles[idx].modele = document.getElementById('edit-veh-modele').value;
-            vehicles[idx].proprietaire = document.getElementById('edit-veh-proprio').value;
-            vehicles[idx].telephone = document.getElementById('edit-veh-tel').value;
-            saveAll();
-            renderVehicles();
-            document.getElementById('edit-vehicle-modal').style.display = 'none';
-            showToast("Véhicule modifié");
-        }
-    });
-    window.deleteVehicle = (id) => {
-        if(confirm("Supprimer ce véhicule ? Les travaux et sinistres liés seront orphelins.")) {
-            vehicles = vehicles.filter(v => v.id !== id);
-            saveAll();
-            renderVehicles();
-            renderWorks();
-            renderSinistres();
+        function renderWorks() {
+            let tbody = document.querySelector('#works-table tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            works.forEach(w => {
+                let veh = getVehicleByImmat(w.immatriculation) || { immatriculation: w.immatriculation };
+                let row = `<tr>
+                    <td>${escapeHtml(veh.immatriculation)}</td>
+                    <td>${escapeHtml(w.type_travaux)}</td>
+                    <td>${escapeHtml(w.date_entree)}</td>
+                    <td><span class="status-badge ${w.statut === 'terminé' ? 'status-termine' : (w.statut==='en cours'?'status-en-cours':'status-ouvert')}">${escapeHtml(w.statut)}</span></td>
+                    <td>${escapeHtml((w.techniciens || []).join(', '))}</td>
+                    <td class="action-buttons">
+                        <button onclick="editWork('${w.id}')">✏️</button>
+                        <button onclick="deleteWork('${w.id}')">🗑️</button>
+                        <button class="btn-warning btn-sm" onclick="addSinistreForVehicle('${escapeHtml(veh.immatriculation)}')">⚠️ Sinistre</button>
+                    </td>
+                `;
+                tbody.innerHTML += row;
+            });
             updateDashboard();
         }
-    };
-    document.getElementById('vehicle-form')?.addEventListener('submit', (e) => {
-        e.preventDefault();
-        let immat = document.getElementById('veh-immat').value.trim().toUpperCase();
-        if(!immat) return showToast("Immatriculation requise");
-        let photoFile = document.getElementById('veh-photo').files[0];
-        let processSave = (photoUrl) => {
-            vehicles.push({ id: genId(), immatriculation: immat, modele: document.getElementById('veh-modele').value, couleur: document.getElementById('veh-couleur').value, proprietaire: document.getElementById('veh-proprio').value, telephone: document.getElementById('veh-tel').value, photo: photoUrl || '' });
-            saveAll();
-            renderVehicles();
-            document.getElementById('vehicle-form').reset();
-            showToast("Véhicule ajouté");
-        };
-        if(photoFile) {
-            let reader = new FileReader();
-            reader.onload = ev => processSave(ev.target.result);
-            reader.readAsDataURL(photoFile);
-        } else processSave('');
-    });
 
-    // ---------- TRAVAUX (avec bouton Sinistre) ----------
-    function renderWorks() {
-        let tbody = document.querySelector('#works-table tbody');
-        if(!tbody) return;
-        tbody.innerHTML = '';
-        works.forEach(w => {
-            let veh = getVehicleByImmat(w.immatriculation) || { immatriculation: w.immatriculation };
-            let row = `<tr>
-                <td>${veh.immatriculation}</td>
-                <td>${w.type_travaux}</td>
-                <td>${w.date_entree}</td>
-                <td><span class="status-badge ${w.statut === 'terminé' ? 'status-termine' : (w.statut==='en cours'?'status-en-cours':'status-ouvert')}">${w.statut}</span></td>
-                <td>${(w.techniciens || []).join(', ')}</td>
-                <td class="action-buttons">
-                    <button onclick="editWork('${w.id}')">✏️</button>
-                    <button onclick="deleteWork('${w.id}')">🗑️</button>
-                    <button class="btn-warning btn-sm" onclick="addSinistreForVehicle('${veh.immatriculation}')">⚠️ Sinistre</button>
-                 </td>
-            </tr>`;
-            tbody.innerHTML += row;
-        });
-        updateDashboard();
-    }
-
-    window.addSinistreForVehicle = (immat) => {
-        document.getElementById('sin-immat').value = immat;
-        let vehicle = getVehicleByImmat(immat);
-        if(vehicle && vehicle.modele) document.getElementById('sin-type').value = vehicle.modele;
-        switchTab('sinistres');
-        document.querySelector('#sinistres-tab .form-section').scrollIntoView({ behavior: 'smooth' });
-        showToast(`Préparation d'un sinistre pour ${immat}`);
-    };
-
-    document.getElementById('work-form')?.addEventListener('submit', (e) => {
-        e.preventDefault();
-        let immat = document.getElementById('work-immat').value.trim().toUpperCase();
-        if(!immat) return showToast("Immatriculation requise");
-        let techs = Array.from(document.getElementById('work-techs').selectedOptions).map(o => o.value);
-        works.push({ id: genId(), immatriculation: immat, type_travaux: document.getElementById('work-type').value, date_entree: document.getElementById('work-date-entree').value, date_sortie: document.getElementById('work-date-sortie').value, statut: document.getElementById('work-statut').value, techniciens: techs, observations: document.getElementById('work-obs').value });
-        saveAll();
-        renderWorks();
-        document.getElementById('work-form').reset();
-        showToast("Travail ajouté");
-    });
-    window.editWork = (id) => {
-        let w = works.find(w => w.id === id);
-        if(w) {
-            document.getElementById('edit-work-id').value = w.id;
-            document.getElementById('edit-work-type').value = w.type_travaux;
-            document.getElementById('edit-work-statut').value = w.statut;
-            document.getElementById('edit-work-obs').value = w.observations || '';
-            document.getElementById('edit-work-modal').style.display = 'flex';
-        }
-    };
-    document.getElementById('edit-work-form')?.addEventListener('submit', (e) => {
-        e.preventDefault();
-        let id = document.getElementById('edit-work-id').value;
-        let idx = works.findIndex(w => w.id === id);
-        if(idx !== -1) {
-            works[idx].type_travaux = document.getElementById('edit-work-type').value;
-            works[idx].statut = document.getElementById('edit-work-statut').value;
-            works[idx].observations = document.getElementById('edit-work-obs').value;
-            saveAll();
-            renderWorks();
-            document.getElementById('edit-work-modal').style.display = 'none';
-            showToast("Travail modifié");
-        }
-    });
-    window.deleteWork = (id) => {
-        if(confirm("Supprimer ce travail ?")) { works = works.filter(w => w.id !== id); saveAll(); renderWorks(); showToast("Supprimé"); }
-    };
-
-    // ---------- SINISTRES ----------
-    function renderSinistres(filteredArr = null) {
-        let data = filteredArr || sinistres;
-        let tbody = document.querySelector('#sinistres-table tbody');
-        if(!tbody) return;
-        tbody.innerHTML = '';
-        data.forEach(s => {
-            let row = `<tr>
-                <td>${s.numero_sinistre}</td>
-                <td>${s.assure || ''}</td>
-                <td>${s.immatriculation}</td>
-                <td>${s.assureur || ''}</td>
-                <td><span class="status-badge">${s.statut}</span></td>
-                <td>${(s.montant||0).toLocaleString()}</td>
-                <td class="action-buttons">
-                    <button onclick="editSinistre('${s.id}')">✏️</button>
-                    <button onclick="deleteSinistre('${s.id}')">🗑️</button>
-                 </td>
-            </tr>`;
-            tbody.innerHTML += row;
-        });
-        updateDashboard();
-        fillSinistreSelect();
-    }
-    window.editSinistre = (id) => {
-        let s = sinistres.find(s => s.id === id);
-        if(s) {
-            document.getElementById('sinistre-id').value = s.id;
-            document.getElementById('sin-numero').value = s.numero_sinistre;
-            document.getElementById('sin-assure').value = s.assure || '';
-            document.getElementById('sin-immat').value = s.immatriculation || '';
-            document.getElementById('sin-type').value = s.type || '';
-            document.getElementById('sin-assureur').value = s.assureur || '';
-            document.getElementById('sin-date-sinistre').value = s.date_sinistre || '';
-            document.getElementById('sin-date-expertise').value = s.date_expertise || '';
-            document.getElementById('sin-montant').value = s.montant || '';
-            document.getElementById('sin-statut').value = s.statut;
-            document.getElementById('sin-obs').value = s.observations || '';
-            let cabinetSelect = document.getElementById('sin-cabinets');
-            Array.from(cabinetSelect.options).forEach(opt => opt.selected = s.cabinet_expert?.includes(opt.value));
-            switchTab('sinistres');
-        }
-    };
-    window.deleteSinistre = (id) => { if(confirm("Supprimer ce sinistre ?")) { sinistres = sinistres.filter(s => s.id !== id); delete documents[id]; saveAll(); renderSinistres(); showToast("Sinistre supprimé"); } };
-    document.getElementById('sinistre-form')?.addEventListener('submit', (e) => {
-        e.preventDefault();
-        let id = document.getElementById('sinistre-id').value;
-        let cabinets = Array.from(document.getElementById('sin-cabinets').selectedOptions).map(o => o.value);
-        let sinData = {
-            id: id || genId(),
-            numero_sinistre: document.getElementById('sin-numero').value,
-            assure: document.getElementById('sin-assure').value,
-            immatriculation: document.getElementById('sin-immat').value.toUpperCase(),
-            type: document.getElementById('sin-type').value,
-            assureur: document.getElementById('sin-assureur').value,
-            cabinet_expert: cabinets,
-            date_sinistre: document.getElementById('sin-date-sinistre').value,
-            date_expertise: document.getElementById('sin-date-expertise').value,
-            montant: parseFloat(document.getElementById('sin-montant').value) || 0,
-            statut: document.getElementById('sin-statut').value,
-            observations: document.getElementById('sin-obs').value,
-            date_creation: new Date().toISOString()
-        };
-        if(id) {
-            let idx = sinistres.findIndex(s => s.id === id);
-            if(idx !== -1) sinistres[idx] = { ...sinistres[idx], ...sinData };
-        } else sinistres.push(sinData);
-        saveAll();
-        renderSinistres();
-        document.getElementById('sinistre-form').reset();
-        document.getElementById('sinistre-id').value = '';
-        showToast("Sinistre enregistré");
-    });
-    document.getElementById('apply-sin-filter')?.addEventListener('click', () => {
-        let num = document.getElementById('filter-sin-num').value.toLowerCase();
-        let immat = document.getElementById('filter-sin-immat').value.toLowerCase();
-        let stat = document.getElementById('filter-sin-statut').value;
-        let filtered = sinistres.filter(s => (num==='' || s.numero_sinistre?.toLowerCase().includes(num)) && (immat==='' || s.immatriculation?.toLowerCase().includes(immat)) && (stat==='' || s.statut === stat));
-        renderSinistres(filtered);
-    });
-
-    // ---------- PHOTOS & DOCS ----------
-    function fillSinistreSelect() {
-        let sel = document.getElementById('doc-sinistre-select');
-        if(!sel) return;
-        sel.innerHTML = '<option value="">-- Choisir un sinistre --</option>';
-        sinistres.forEach(s => { let opt = document.createElement('option'); opt.value = s.id; opt.textContent = `${s.numero_sinistre} - ${s.immatriculation}`; sel.appendChild(opt); });
-    }
-    function renderDocs(sinistreId) {
-        let gallery = document.getElementById('documents-gallery');
-        if(!gallery) return;
-        gallery.innerHTML = '';
-        let docs = documents[sinistreId] || [];
-        if(docs.length === 0) { gallery.innerHTML = '<p>Aucun document pour ce sinistre</p>'; return; }
-        docs.forEach(doc => {
-            let isImg = doc.type.startsWith('image');
-            let card = document.createElement('div'); card.className = 'photo-card';
-            if(isImg) card.innerHTML = `<img src="${doc.dataUrl}" style="width:100%;height:100%;object-fit:cover"><button onclick="deleteDoc('${sinistreId}','${doc.id}')" style="position:absolute;top:5px;right:5px;background:#ef4444;color:white;border:none;border-radius:50%;width:28px;">✖</button>`;
-            else card.innerHTML = `<div style="background:#e2e8f0;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;"><i class="fas fa-file-pdf fa-2x"></i><span style="font-size:10px;">${doc.name}</span><button onclick="deleteDoc('${sinistreId}','${doc.id}')" style="margin-top:5px;">Supprimer</button></div>`;
-            gallery.appendChild(card);
-        });
-    }
-    window.deleteDoc = (sinId, docId) => {
-        if(documents[sinId]) documents[sinId] = documents[sinId].filter(d => d.id !== docId);
-        if(documents[sinId]?.length === 0) delete documents[sinId];
-        saveAll();
-        renderDocs(sinId);
-        showToast("Document supprimé");
-    };
-    document.getElementById('doc-sinistre-select')?.addEventListener('change', (e) => { if(e.target.value) renderDocs(e.target.value); else document.getElementById('documents-gallery').innerHTML = ''; });
-    document.getElementById('add-doc-btn')?.addEventListener('click', () => { let sinId = document.getElementById('doc-sinistre-select').value; if(!sinId) { showToast("Sélectionnez un sinistre"); return; } document.getElementById('doc-file-input').click(); });
-    document.getElementById('doc-file-input')?.addEventListener('change', (e) => {
-        let file = e.target.files[0];
-        if(!file) return;
-        let sinId = document.getElementById('doc-sinistre-select').value;
-        let reader = new FileReader();
-        reader.onload = ev => {
-            if(!documents[sinId]) documents[sinId] = [];
-            documents[sinId].push({ id: genId(), name: file.name, type: file.type, dataUrl: ev.target.result, date: new Date().toISOString() });
-            saveAll();
-            renderDocs(sinId);
-            showToast("Document ajouté");
-        };
-        reader.readAsDataURL(file);
-        e.target.value = '';
-    });
-
-    // ---------- RECHERCHE ----------
-    document.getElementById('do-search')?.addEventListener('click', () => {
-        let immat = document.getElementById('search-immat').value.trim().toUpperCase();
-        let sinNum = document.getElementById('search-sin-num').value.trim();
-        let assureur = document.getElementById('search-assureur').value.trim().toLowerCase();
-        let sinStat = document.getElementById('search-sin-statut').value;
-        let workType = document.getElementById('search-work-type').value;
-        let results = { vehicles: [], works: [], sinistres: [] };
-        if(immat) {
-            results.vehicles = vehicles.filter(v => v.immatriculation.includes(immat));
-            results.works = works.filter(w => w.immatriculation.includes(immat));
-            results.sinistres = sinistres.filter(s => s.immatriculation.includes(immat));
-        }
-        if(sinNum) results.sinistres = sinistres.filter(s => s.numero_sinistre?.toLowerCase().includes(sinNum.toLowerCase()));
-        if(assureur) results.sinistres = results.sinistres.filter(s => s.assureur?.toLowerCase().includes(assureur));
-        if(sinStat) results.sinistres = results.sinistres.filter(s => s.statut === sinStat);
-        if(workType) results.works = results.works.filter(w => w.type_travaux === workType);
-        let container = document.getElementById('search-results-container');
-        container.innerHTML = `<h3>Véhicules (${results.vehicles.length})</h3><ul>${results.vehicles.map(v=>`<li>${v.immatriculation} - ${v.modele}</li>`).join('')}</ul>
-                               <h3>Travaux (${results.works.length})</h3><ul>${results.works.map(w=>`<li>${w.immatriculation} - ${w.type_travaux} (${w.statut})</li>`).join('')}</ul>
-                               <h3>Sinistres (${results.sinistres.length})</h3><ul>${results.sinistres.map(s=>`<li>${s.numero_sinistre} - ${s.immatriculation} - ${s.statut}</li>`).join('')}</ul>`;
-    });
-
-    // ---------- DASHBOARD & SYNCHRO ----------
-    function updateDashboard() {
-        let travauxEnCours = works.filter(w => w.statut === 'en cours').length;
-        let sinistresOuverts = sinistres.filter(s => s.statut !== 'clos').length;
-        let attenteRapport = sinistres.filter(s => s.statut === 'en attente rapport').length;
-        document.getElementById('stat-travaux-en-cours').innerText = travauxEnCours;
-        document.getElementById('stat-sinistres-ouverts').innerText = sinistresOuverts;
-        document.getElementById('stat-attente-rapport').innerText = attenteRapport;
-        let lastWorks = [...works].sort((a,b)=>new Date(b.date_entree)-new Date(a.date_entree)).slice(0,5);
-        let tbodyDash = document.querySelector('#dashboard-last-works tbody');
-        if(tbodyDash) {
-            tbodyDash.innerHTML = '';
-            lastWorks.forEach(w => {
-                let veh = getVehicleByImmat(w.immatriculation) || { immatriculation: w.immatriculation };
-                tbodyDash.innerHTML += `<tr><td>${veh.immatriculation}</td><td>${w.type_travaux}</td><td>${w.statut}</td><td>${(w.techniciens||[]).join(',')}</td><td>${w.date_entree}</td></tr>`;
+        function renderSinistres(filteredArr = null) {
+            let data = filteredArr || sinistres;
+            let tbody = document.querySelector('#sinistres-table tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            data.forEach(s => {
+                let montantAffiche = formatMontant(s.montant);
+                let row = `<tr>
+                    <td>${escapeHtml(s.numero_sinistre)}</td>
+                    <td>${escapeHtml(s.assure || '')}</td>
+                    <td>${escapeHtml(s.immatriculation)}</td>
+                    <td>${escapeHtml(s.assureur || '')}</td>
+                    <td><span class="status-badge">${escapeHtml(s.statut)}</span></td>
+                    <td>${montantAffiche}</td>
+                    <td class="action-buttons">
+                        <button onclick="editSinistre('${s.id}')">✏️</button>
+                        <button onclick="deleteSinistre('${s.id}')">🗑️</button>
+                    </td>
+                `;
+                tbody.innerHTML += row;
             });
+            updateDashboard();
+            fillSinistreSelect();
         }
-    }
 
-    document.getElementById('export-excel')?.addEventListener('click', () => {
-        let ws1 = XLSX.utils.json_to_sheet(vehicles.map(v=>({Immatriculation:v.immatriculation, Modele:v.modele, Proprietaire:v.proprietaire, Telephone:v.telephone})));
-        let ws2 = XLSX.utils.json_to_sheet(works.map(w=>({Immatriculation:w.immatriculation, Type:w.type_travaux, Date_entree:w.date_entree, Statut:w.statut, Techniciens:w.techniciens?.join(',')})));
-        let ws3 = XLSX.utils.json_to_sheet(sinistres.map(s=>({Numero:s.numero_sinistre, Assure:s.assure, Vehicule:s.immatriculation, Assureur:s.assureur, Statut:s.statut, Montant:s.montant})));
-        let wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws1, "Vehicules");
-        XLSX.utils.book_append_sheet(wb, ws2, "Travaux");
-        XLSX.utils.book_append_sheet(wb, ws3, "Sinistres");
-        XLSX.writeFile(wb, `hr_motors_${new Date().toISOString().slice(0,10)}.xlsx`);
-        showToast("Export Excel réussi");
-    });
-    document.getElementById('export-pdf')?.addEventListener('click', async () => {
-        const { jsPDF } = window.jspdf;
-        let doc = new jsPDF();
-        doc.text("Rapport HR Motors", 14, 15);
-        doc.text(`Généré le ${new Date().toLocaleDateString()}`, 14, 25);
-        doc.autoTable({ startY: 35, head: [['Immat', 'Modèle', 'Propriétaire']], body: vehicles.map(v=>[v.immatriculation, v.modele||'', v.proprietaire||'']) });
-        let y = doc.lastAutoTable.finalY + 10;
-        doc.autoTable({ startY: y, head: [['Immat', 'Travaux', 'Statut']], body: works.map(w=>[w.immatriculation, w.type_travaux, w.statut]) });
-        y = doc.lastAutoTable.finalY + 10;
-        doc.autoTable({ startY: y, head: [['N° sinistre', 'Véhicule', 'Statut']], body: sinistres.map(s=>[s.numero_sinistre, s.immatriculation, s.statut]) });
-        doc.save(`hr_report_${new Date().toISOString().slice(0,10)}.pdf`);
-        showToast("PDF généré");
-    });
-
-    document.getElementById('export-json')?.addEventListener('click', () => {
-    let exportObj = { vehicles, works, sinistres, documents };
-    let jsonStr = JSON.stringify(exportObj, null, 2);
-    let fileName = `hr_motors_backup_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.json`;
-    const blob = new Blob([jsonStr], {type: 'application/json'});
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(link.href);
-    showToast("✅ Sauvegarde JSON téléchargée");
-});
-
-    document.getElementById('import-json-file')?.addEventListener('change', (e) => {
-        let file = e.target.files[0];
-        if(!file) return;
-        let reader = new FileReader();
-        reader.onload = ev => {
-            try {
-                let data = JSON.parse(ev.target.result);
-                if(data.vehicles) vehicles = data.vehicles;
-                if(data.works) works = data.works;
-                if(data.sinistres) sinistres = data.sinistres;
-                if(data.documents) documents = data.documents;
-                saveAll();
-                renderVehicles(); renderWorks(); renderSinistres(); fillSinistreSelect(); updateDashboard();
-                showToast("Import JSON réussi");
-            } catch(e) { showToast("Fichier JSON invalide"); }
-        };
-        reader.readAsText(file);
-        e.target.value = '';
-    });
-    document.getElementById('share-data')?.addEventListener('click', async () => {
-        let exportObj = { vehicles, works, sinistres, documents };
-        let jsonStr = JSON.stringify(exportObj, null, 2);
-        let date = new Date().toISOString().slice(0,19).replace(/:/g, '-');
-        let fileName = `hr_backup_${date}.json`;
-
-          // Méthode 1 : partage via Web Share (si disponible et accepte les fichiers)
-        if (navigator.share && navigator.canShare && navigator.canShare({ files: [new File([jsonStr], fileName, {type: 'application/json'})] })) {
-        try {
-            const file = new File([jsonStr], fileName, { type: 'application/json' });
-            await navigator.share({
-                title: 'Sauvegarde HR Motors',
-                text: 'Voici votre fichier de sauvegarde',
-                files: [file]
-            });
-            showToast("📤 Fichier partagé !");
-        } catch (err) {
-            if (err.name !== 'AbortError') {
-                showToast("❌ Échec du partage, copie dans presse-papier");
-                copyToClipboard(jsonStr, fileName);
-            } else {
-                showToast("Partage annulé");
+        function updateDashboard() {
+            let travauxEnCours = works.filter(w => w.statut === 'en cours').length;
+            let sinistresOuverts = sinistres.filter(s => s.statut !== 'clos').length;
+            let attenteRapport = sinistres.filter(s => s.statut === 'en attente rapport').length;
+            document.getElementById('stat-travaux-en-cours').innerText = travauxEnCours;
+            document.getElementById('stat-sinistres-ouverts').innerText = sinistresOuverts;
+            document.getElementById('stat-attente-rapport').innerText = attenteRapport;
+            let lastWorks = [...works].sort((a,b)=>new Date(b.date_entree)-new Date(a.date_entree)).slice(0,5);
+            let tbodyDash = document.querySelector('#dashboard-last-works tbody');
+            if (tbodyDash) {
+                tbodyDash.innerHTML = '';
+                lastWorks.forEach(w => {
+                    let veh = getVehicleByImmat(w.immatriculation) || { immatriculation: w.immatriculation };
+                    tbodyDash.innerHTML += `<tr>
+                        <td>${escapeHtml(veh.immatriculation)}</td>
+                        <td>${escapeHtml(w.type_travaux)}</td>
+                        <td>${escapeHtml(w.statut)}</td>
+                        <td>${escapeHtml((w.techniciens||[]).join(', '))}</td>
+                        <td>${escapeHtml(w.date_entree)}</td>
+                    </tr>`;
+                });
             }
         }
-    } 
-    // Méthode 2 : téléchargement direct (fallback)
-    else {
-        downloadJson(jsonStr, fileName);
-        showToast("📁 Fichier JSON téléchargé (sauvegarde locale)");
-    }
-    });
 
-    function downloadJson(content, fileName) {
-    const blob = new Blob([content], {type: 'application/json'});
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(link.href);
-}
+        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+        function formatMontant(val) {
+            if (val === undefined || val === null || val === '') return '0 FCFA';
+            let num = parseFloat(val);
+            if (isNaN(num)) return escapeHtml(String(val));
+            return num.toLocaleString('fr-FR') + ' FCFA';
+        }
 
-function copyToClipboard(text, fileName) {
-    navigator.clipboard.writeText(text).then(() => {
-        showToast(`✅ Données copiées (collez dans un fichier nommé ${fileName})`);
-    }).catch(() => showToast("❌ Impossible de copier"));
-}
+        // ----- CRUD VEHICULES -----
+        window.openEditVehicle = (id) => {
+            let v = vehicles.find(v => v.id === id);
+            if(v) {
+                document.getElementById('edit-veh-id').value = v.id;
+                document.getElementById('edit-veh-immat').value = v.immatriculation;
+                document.getElementById('edit-veh-modele').value = v.modele || '';
+                document.getElementById('edit-veh-proprio').value = v.proprietaire || '';
+                document.getElementById('edit-veh-tel').value = v.telephone || '';
+                document.getElementById('edit-vehicle-modal').style.display = 'flex';
+            }
+        };
+        document.getElementById('edit-vehicle-form')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            let id = document.getElementById('edit-veh-id').value;
+            let idx = vehicles.findIndex(v => v.id === id);
+            if(idx !== -1) {
+                vehicles[idx].immatriculation = document.getElementById('edit-veh-immat').value.trim().toUpperCase();
+                vehicles[idx].modele = document.getElementById('edit-veh-modele').value;
+                vehicles[idx].proprietaire = document.getElementById('edit-veh-proprio').value;
+                vehicles[idx].telephone = document.getElementById('edit-veh-tel').value;
+                saveAll();
+                renderVehicles();
+                document.getElementById('edit-vehicle-modal').style.display = 'none';
+                showToast("Véhicule modifié");
+            }
+        });
+        window.deleteVehicle = (id) => {
+            if(confirm("Supprimer ce véhicule ?")) {
+                vehicles = vehicles.filter(v => v.id !== id);
+                saveAll();
+                renderVehicles();
+                renderWorks();
+                renderSinistres();
+                showToast("Véhicule supprimé");
+            }
+        };
+        document.getElementById('vehicle-form')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            let immat = document.getElementById('veh-immat').value.trim().toUpperCase();
+            if(!immat) return showToast("Immatriculation requise");
+            let photoFile = document.getElementById('veh-photo').files[0];
+            let processSave = (photoUrl) => {
+                vehicles.push({ id: genId(), immatriculation: immat, modele: document.getElementById('veh-modele').value, couleur: document.getElementById('veh-couleur').value, proprietaire: document.getElementById('veh-proprio').value, telephone: document.getElementById('veh-tel').value, photo: photoUrl || '' });
+                saveAll();
+                renderVehicles();
+                document.getElementById('vehicle-form').reset();
+                showToast("Véhicule ajouté");
+            };
+            if(photoFile) {
+                let reader = new FileReader();
+                reader.onload = ev => processSave(ev.target.result);
+                reader.readAsDataURL(photoFile);
+            } else processSave('');
+        });
 
-    // initial load
-    renderVehicles(); renderWorks(); renderSinistres(); updateDashboard(); fillSinistreSelect();
+        // ----- TRAVAUX -----
+        window.editWork = (id) => {
+            let w = works.find(w => w.id === id);
+            if(w) {
+                document.getElementById('edit-work-id').value = w.id;
+                document.getElementById('edit-work-type').value = w.type_travaux;
+                document.getElementById('edit-work-statut').value = w.statut;
+                document.getElementById('edit-work-obs').value = w.observations || '';
+                document.getElementById('edit-work-modal').style.display = 'flex';
+            }
+        };
+        document.getElementById('edit-work-form')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            let id = document.getElementById('edit-work-id').value;
+            let idx = works.findIndex(w => w.id === id);
+            if(idx !== -1) {
+                works[idx].type_travaux = document.getElementById('edit-work-type').value;
+                works[idx].statut = document.getElementById('edit-work-statut').value;
+                works[idx].observations = document.getElementById('edit-work-obs').value;
+                saveAll();
+                renderWorks();
+                document.getElementById('edit-work-modal').style.display = 'none';
+                showToast("Travail modifié");
+            }
+        });
+        window.deleteWork = (id) => {
+            if(confirm("Supprimer ce travail ?")) { works = works.filter(w => w.id !== id); saveAll(); renderWorks(); showToast("Supprimé"); }
+        };
+        document.getElementById('work-form')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            let immat = document.getElementById('work-immat').value.trim().toUpperCase();
+            if(!immat) return showToast("Immatriculation requise");
+            let techs = Array.from(document.getElementById('work-techs').selectedOptions).map(o => o.value);
+            works.push({ id: genId(), immatriculation: immat, type_travaux: document.getElementById('work-type').value, date_entree: document.getElementById('work-date-entree').value, date_sortie: document.getElementById('work-date-sortie').value, statut: document.getElementById('work-statut').value, techniciens: techs, observations: document.getElementById('work-obs').value });
+            saveAll();
+            renderWorks();
+            document.getElementById('work-form').reset();
+            showToast("Travail ajouté");
+        });
+        window.addWorkForVehicle = (immat) => {
+            switchTab('works');
+            requestAnimationFrame(() => {
+                document.getElementById('work-immat').value = immat;
+                document.getElementById('work-date-entree').value = new Date().toISOString().slice(0,10);
+                document.querySelector('#works-tab .form-section').scrollIntoView({ behavior: 'smooth' });
+                showToast(`Préparation d'un travail pour ${immat}`);
+            });
+        };
+        window.addSinistreForVehicle = (immat) => {
+            switchTab('sinistres');
+            requestAnimationFrame(() => {
+                document.getElementById('sin-immat').value = immat;
+                let vehicle = getVehicleByImmat(immat);
+                if(vehicle && vehicle.modele) document.getElementById('sin-type').value = vehicle.modele;
+                document.querySelector('#sinistres-tab .form-section').scrollIntoView({ behavior: 'smooth' });
+                showToast(`Préparation d'un sinistre pour ${immat}`);
+            });
+        };
+
+        // ----- SINISTRES -----
+        window.editSinistre = (id) => {
+            let s = sinistres.find(s => s.id === id);
+            if(s) {
+                document.getElementById('sinistre-id').value = s.id;
+                document.getElementById('sin-numero').value = s.numero_sinistre;
+                document.getElementById('sin-assure').value = s.assure || '';
+                document.getElementById('sin-immat').value = s.immatriculation || '';
+                document.getElementById('sin-type').value = s.type || '';
+                document.getElementById('sin-assureur').value = s.assureur || '';
+                document.getElementById('sin-date-sinistre').value = s.date_sinistre || '';
+                document.getElementById('sin-date-expertise').value = s.date_expertise || '';
+                document.getElementById('sin-photo-avant').value = s.photo_avant || '';
+                document.getElementById('sin-photo-apres').value = s.photo_apres || '';
+                document.getElementById('sin-date-photos').value = s.date_photos || '';
+                document.getElementById('sin-date-livraison').value = s.date_livraison || '';
+                document.getElementById('sin-montant').value = s.montant !== undefined && !isNaN(parseFloat(s.montant)) ? s.montant : (typeof s.montant === 'string' ? s.montant : '');
+                document.getElementById('sin-statut').value = s.statut;
+                document.getElementById('sin-obs').value = s.observations || '';
+                let cabinetSelect = document.getElementById('sin-cabinets');
+                Array.from(cabinetSelect.options).forEach(opt => opt.selected = s.cabinet_expert?.includes(opt.value));
+                switchTab('sinistres');
+            }
+        };
+        window.deleteSinistre = (id) => {
+            if(confirm("Supprimer ce sinistre ?")) {
+                sinistres = sinistres.filter(s => s.id !== id);
+                delete documents[id];
+                saveAll();
+                renderSinistres();
+                showToast("Sinistre supprimé");
+            }
+        };
+        document.getElementById('sinistre-form')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            let id = document.getElementById('sinistre-id').value;
+            let cabinets = Array.from(document.getElementById('sin-cabinets').selectedOptions).map(o => o.value);
+            let montantRaw = document.getElementById('sin-montant').value.trim();
+            let montantFinal = montantRaw;
+            if (!isNaN(parseFloat(montantRaw)) && isFinite(montantRaw)) montantFinal = parseFloat(montantRaw);
+            let sinData = {
+                id: id || genId(),
+                numero_sinistre: document.getElementById('sin-numero').value,
+                assure: document.getElementById('sin-assure').value,
+                immatriculation: document.getElementById('sin-immat').value.toUpperCase(),
+                type: document.getElementById('sin-type').value,
+                assureur: document.getElementById('sin-assureur').value,
+                cabinet_expert: cabinets,
+                date_sinistre: document.getElementById('sin-date-sinistre').value,
+                date_expertise: document.getElementById('sin-date-expertise').value,
+                photo_avant: document.getElementById('sin-photo-avant').value,
+                photo_apres: document.getElementById('sin-photo-apres').value,
+                date_photos: document.getElementById('sin-date-photos').value,
+                date_livraison: document.getElementById('sin-date-livraison').value,
+                montant: montantFinal,
+                statut: document.getElementById('sin-statut').value,
+                observations: document.getElementById('sin-obs').value,
+                date_creation: new Date().toISOString()
+            };
+            if(id) {
+                let idx = sinistres.findIndex(s => s.id === id);
+                if(idx !== -1) sinistres[idx] = { ...sinistres[idx], ...sinData };
+            } else sinistres.push(sinData);
+            saveAll();
+            renderSinistres();
+            document.getElementById('sinistre-form').reset();
+            document.getElementById('sinistre-id').value = '';
+            showToast("Sinistre enregistré");
+        });
+        document.getElementById('apply-sin-filter')?.addEventListener('click', () => {
+            let num = document.getElementById('filter-sin-num').value.toLowerCase();
+            let immat = document.getElementById('filter-sin-immat').value.toLowerCase();
+            let stat = document.getElementById('filter-sin-statut').value;
+            let filtered = sinistres.filter(s => (num==='' || s.numero_sinistre?.toLowerCase().includes(num)) && (immat==='' || s.immatriculation?.toLowerCase().includes(immat)) && (stat==='' || s.statut === stat));
+            renderSinistres(filtered);
+        });
+
+        // ----- PHOTOS & DOCS -----
+        function fillSinistreSelect() {
+            let sel = document.getElementById('doc-sinistre-select');
+            if(!sel) return;
+            sel.innerHTML = '<option value="">-- Choisir un sinistre --</option>';
+            sinistres.forEach(s => { let opt = document.createElement('option'); opt.value = s.id; opt.textContent = `${s.numero_sinistre} - ${s.immatriculation}`; sel.appendChild(opt); });
+        }
+        function renderDocs(sinistreId) {
+            let gallery = document.getElementById('documents-gallery');
+            if(!gallery) return;
+            gallery.innerHTML = '';
+            let docs = documents[sinistreId] || [];
+            if(docs.length === 0) { gallery.innerHTML = '<p>Aucun document pour ce sinistre</p>'; return; }
+            docs.forEach(doc => {
+                let isImg = doc.type.startsWith('image');
+                let card = document.createElement('div'); card.className = 'photo-card';
+                if(isImg) card.innerHTML = `<img src="${doc.dataUrl}" style="width:100%;height:100%;object-fit:cover"><button onclick="deleteDoc('${sinistreId}','${doc.id}')" style="position:absolute;top:5px;right:5px;background:#ef4444;color:white;border:none;border-radius:50%;width:28px;">✖</button>`;
+                else card.innerHTML = `<div style="background:#e2e8f0;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;"><i class="fas fa-file-pdf fa-2x"></i><span style="font-size:10px;">${doc.name}</span><button onclick="deleteDoc('${sinistreId}','${doc.id}')" style="margin-top:5px;">Supprimer</button></div>`;
+                gallery.appendChild(card);
+            });
+        }
+        window.deleteDoc = (sinId, docId) => {
+            if(documents[sinId]) documents[sinId] = documents[sinId].filter(d => d.id !== docId);
+            if(documents[sinId]?.length === 0) delete documents[sinId];
+            saveAll();
+            renderDocs(sinId);
+            showToast("Document supprimé");
+        };
+        document.getElementById('doc-sinistre-select')?.addEventListener('change', (e) => { if(e.target.value) renderDocs(e.target.value); else document.getElementById('documents-gallery').innerHTML = ''; });
+        document.getElementById('add-doc-btn')?.addEventListener('click', () => { let sinId = document.getElementById('doc-sinistre-select').value; if(!sinId) { showToast("Sélectionnez un sinistre"); return; } document.getElementById('doc-file-input').click(); });
+        document.getElementById('doc-file-input')?.addEventListener('change', (e) => {
+            let file = e.target.files[0];
+            if(!file) return;
+            let sinId = document.getElementById('doc-sinistre-select').value;
+            let reader = new FileReader();
+            reader.onload = ev => {
+                if(!documents[sinId]) documents[sinId] = [];
+                documents[sinId].push({ id: genId(), name: file.name, type: file.type, dataUrl: ev.target.result, date: new Date().toISOString() });
+                saveAll();
+                renderDocs(sinId);
+                showToast("Document ajouté");
+            };
+            reader.readAsDataURL(file);
+            e.target.value = '';
+        });
+
+        // ----- RECHERCHE -----
+        document.getElementById('do-search')?.addEventListener('click', () => {
+            let immat = document.getElementById('search-immat').value.trim().toUpperCase();
+            let sinNum = document.getElementById('search-sin-num').value.trim();
+            let assureur = document.getElementById('search-assureur').value.trim().toLowerCase();
+            let sinStat = document.getElementById('search-sin-statut').value;
+            let workType = document.getElementById('search-work-type').value;
+            let results = { vehicles: [], works: [], sinistres: [] };
+            if(immat) {
+                results.vehicles = vehicles.filter(v => v.immatriculation.includes(immat));
+                results.works = works.filter(w => w.immatriculation.includes(immat));
+                results.sinistres = sinistres.filter(s => s.immatriculation.includes(immat));
+            }
+            if(sinNum) results.sinistres = sinistres.filter(s => s.numero_sinistre?.toLowerCase().includes(sinNum.toLowerCase()));
+            if(assureur) results.sinistres = results.sinistres.filter(s => s.assureur?.toLowerCase().includes(assureur));
+            if(sinStat) results.sinistres = results.sinistres.filter(s => s.statut === sinStat);
+            if(workType) results.works = results.works.filter(w => w.type_travaux === workType);
+            let container = document.getElementById('search-results-container');
+            container.innerHTML = `<h3>Véhicules (${results.vehicles.length})</h3><ul>${results.vehicles.map(v=>`<li>${escapeHtml(v.immatriculation)} - ${escapeHtml(v.modele)}</li>`).join('')}</ul>
+                                   <h3>Travaux (${results.works.length})</h3><ul>${results.works.map(w=>`<li>${escapeHtml(w.immatriculation)} - ${escapeHtml(w.type_travaux)} (${escapeHtml(w.statut)})</li>`).join('')}</ul>
+                                   <h3>Sinistres (${results.sinistres.length})</h3><ul>${results.sinistres.map(s=>`<li>${escapeHtml(s.numero_sinistre)} - ${escapeHtml(s.immatriculation)} - ${escapeHtml(s.statut)}</li>`).join('')}</ul>`;
+        });
+
+        // ----- EXPORTS -----
+        document.getElementById('export-excel')?.addEventListener('click', () => {
+            function formatDateForExcel(dateStr) { if (!dateStr) return ""; let d = new Date(dateStr); return d.toLocaleDateString('fr-FR'); }
+            const buildRows = (list) => list.map(s => {
+                const veh = vehicles.find(v => v.immatriculation === s.immatriculation) || {};
+                let montantVal = s.montant;
+                let montantAffiche = (typeof montantVal === 'number' && !isNaN(montantVal)) ? montantVal : (isNaN(parseFloat(montantVal)) ? montantVal : parseFloat(montantVal));
+                return {
+                    "ASSURE": s.assure || "",
+                    "VEHIC": veh.modele || s.type || "",
+                    "IMMAT": s.immatriculation || "",
+                    "SINISTRE": s.numero_sinistre || "",
+                    "ASSUR": s.assureur || "",
+                    "PHOTO AVT TVX": s.photo_avant || "",
+                    "PHOTO AP TVX": s.photo_apres || "",
+                    "DATE": formatDateForExcel(s.date_photos),
+                    "DATE LIVRAISON": formatDateForExcel(s.date_livraison),
+                    "MONTANT": montantAffiche,
+                    "COMMENTAIRE": s.observations || "",
+                    "CABINET EXPERT": Array.isArray(s.cabinet_expert) ? s.cabinet_expert.join(", ") : (s.cabinet_expert || ""),
+                    "STATUT": s.statut || ""
+                };
+            });
+            const wb = XLSX.utils.book_new();
+            const attenteRows = buildRows(sinistres.filter(s => s.statut === "en attente rapport"));
+            if (attenteRows.length) { const ws1 = XLSX.utils.json_to_sheet(attenteRows); XLSX.utils.book_append_sheet(wb, ws1, "RAPPORT EN ATTENTES"); }
+            const cabinets = ["PARACLET", "LCA", "AMON", "BCA", "ATLANTIQUE", "SGA"];
+            cabinets.forEach(cab => {
+                const filtered = sinistres.filter(s => s.cabinet_expert && s.cabinet_expert.includes(cab));
+                if (filtered.length) { const ws = XLSX.utils.json_to_sheet(buildRows(filtered)); XLSX.utils.book_append_sheet(wb, ws, cab); }
+            });
+            if (sinistres.length) { const wsAll = XLSX.utils.json_to_sheet(buildRows(sinistres)); XLSX.utils.book_append_sheet(wb, wsAll, "TOUS SINISTRES"); }
+            XLSX.writeFile(wb, `REC_RAPPORT_${new Date().toISOString().slice(0,10)}.xlsx`);
+            showToast("Export Excel multi‑feuilles (modèle complet)");
+        });
+
+        document.getElementById('export-pdf')?.addEventListener('click', () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'portrait' });
+            const today = new Date().toLocaleDateString('fr-FR');
+            const title = "RAPPORT SINISTRES - HR MOTORS";
+
+            // Préparer les données (sans colonne TYPE)
+            const rowsPrincipal = sinistres.map(s => {
+                const veh = vehicles.find(v => v.immatriculation === s.immatriculation) || {};
+                let montantTexte = s.montant;
+                if (typeof montantTexte === 'number' && !isNaN(montantTexte)) montantTexte = montantTexte.toLocaleString('fr-FR') + ' FCFA';
+                else if (!isNaN(parseFloat(montantTexte))) montantTexte = parseFloat(montantTexte).toLocaleString('fr-FR') + ' FCFA';
+                else if (!montantTexte) montantTexte = 'NC';
+                return [
+                    s.assure || '',
+                    veh.modele || s.type || '',
+                    s.immatriculation || '',
+                    s.numero_sinistre || '',
+                    s.assureur || '',
+                    s.statut || '',
+                    montantTexte
+                ];
+            });
+            const headersPrincipal = ["ASSURE", "VEHICULE", "IMMAT", "SINISTRE", "ASSUR", "STATUT", "MONTANT"];
+
+            const rowsSecondaire = sinistres.map(s => [
+                s.photo_avant || '',
+                s.photo_apres || '',
+                s.date_photos ? new Date(s.date_photos).toLocaleDateString('fr-FR') : '',
+                s.date_livraison ? new Date(s.date_livraison).toLocaleDateString('fr-FR') : '',
+                s.observations || '',
+                Array.isArray(s.cabinet_expert) ? s.cabinet_expert.join(", ") : (s.cabinet_expert || '')
+            ]);
+            const headersSecondaire = ["PHOTO AVT", "PHOTO AP", "DATE PHOTOS", "DATE LIVR", "COMMENTAIRE", "CABINET EXPERT"];
+
+            // Page 1
+            doc.setFillColor(41, 128, 185);
+            doc.rect(0, 0, 210, 30, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(18);
+            doc.text(title, 105, 18, { align: 'center' });
+            doc.setFontSize(10);
+            doc.text(`Généré le ${today} - Page 1/2`, 105, 27, { align: 'center' });
+            doc.setTextColor(0, 0, 0);
+            doc.autoTable({
+                head: [headersPrincipal],
+                body: rowsPrincipal,
+                startY: 35,
+                theme: 'grid',
+                styles: { fontSize: 9, cellPadding: 3, overflow: 'linebreak', valign: 'middle' },
+                headStyles: { fillColor: [52, 73, 94], textColor: 255, fontSize: 10, halign: 'center' },
+                alternateRowStyles: { fillColor: [245, 245, 245] },
+                columnStyles: {
+                    0: { cellWidth: 25 }, 1: { cellWidth: 25 }, 2: { cellWidth: 22 }, 3: { cellWidth: 30 },
+                    4: { cellWidth: 25 }, 5: { cellWidth: 18 }, 6: { cellWidth: 25 }
+                }
+            });
+            // Page 2
+            doc.addPage();
+            doc.setFillColor(41, 128, 185);
+            doc.rect(0, 0, 210, 30, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(18);
+            doc.text(title, 105, 18, { align: 'center' });
+            doc.setFontSize(10);
+            doc.text(`Généré le ${today} - Page 2/2 (détails photos & commentaires)`, 105, 27, { align: 'center' });
+            doc.setTextColor(0, 0, 0);
+            doc.autoTable({
+                head: [headersSecondaire],
+                body: rowsSecondaire,
+                startY: 35,
+                theme: 'grid',
+                styles: { fontSize: 9, cellPadding: 3, overflow: 'linebreak' },
+                headStyles: { fillColor: [52, 73, 94], textColor: 255, fontSize: 10, halign: 'center' },
+                alternateRowStyles: { fillColor: [245, 245, 245] },
+                columnStyles: {
+                    0: { cellWidth: 20 }, 1: { cellWidth: 20 }, 2: { cellWidth: 25 }, 3: { cellWidth: 25 },
+                    4: { cellWidth: 50 }, 5: { cellWidth: 40 }
+                }
+            });
+            doc.save(`REC_RAPPORT_${new Date().toISOString().slice(0,10)}.pdf`);
+            showToast("PDF généré (deux pages, design pro)");
+        });
+
+        document.getElementById('export-json')?.addEventListener('click', () => {
+            const exportObj = { vehicles, works, sinistres, documents };
+            const jsonStr = JSON.stringify(exportObj, null, 2);
+            const fileName = `hr_motors_backup_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.json`;
+            const blob = new Blob([jsonStr], {type: 'application/json'});
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+            showToast("Sauvegarde JSON téléchargée");
+        });
+
+        document.getElementById('import-json-file')?.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = ev => {
+                try {
+                    const data = JSON.parse(ev.target.result);
+                    if (data.vehicles) vehicles = data.vehicles;
+                    if (data.works) works = data.works;
+                    if (data.sinistres) sinistres = data.sinistres;
+                    if (data.documents) documents = data.documents;
+                    saveAll();
+                    renderVehicles(); renderWorks(); renderSinistres(); fillSinistreSelect(); updateDashboard();
+                    showToast("Import JSON réussi");
+                } catch(e) { showToast("Fichier JSON invalide"); }
+            };
+            reader.readAsText(file);
+            e.target.value = '';
+        });
+
+        document.getElementById('share-data')?.addEventListener('click', async () => {
+            const exportObj = { vehicles, works, sinistres, documents };
+            const jsonStr = JSON.stringify(exportObj, null, 2);
+            const fileName = `hr_share_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.json`;
+            const file = new File([jsonStr], fileName, { type: 'application/json' });
+            if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({ title: "Sauvegarde HR Motors", files: [file] });
+                    showToast("Partage réussi");
+                } catch (err) {
+                    if (err.name !== 'AbortError') fallbackShare(jsonStr, fileName);
+                    else showToast("Partage annulé");
+                }
+            } else fallbackShare(jsonStr, fileName);
+            function fallbackShare(text, filename) {
+                const blob = new Blob([text], {type: 'application/json'});
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(a.href);
+                showToast("Fichier JSON téléchargé");
+            }
+        });
+
+        // ----- NAVIGATION -----
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+            document.querySelector(`.menu-item[data-tab="${tabName}"]`).classList.add('active');
+            if(tabName === 'vehicles') renderVehicles();
+            if(tabName === 'works') renderWorks();
+            if(tabName === 'sinistres') renderSinistres();
+            if(tabName === 'photos') fillSinistreSelect();
+            if(tabName === 'dashboard') updateDashboard();
+            if (window.innerWidth <= 768) document.querySelector('.sidebar').classList.remove('open');
+        }
+        const mobileBtn = document.querySelector('.mobile-menu-btn');
+        const sidebar = document.querySelector('.sidebar');
+        if (mobileBtn) mobileBtn.addEventListener('click', (e) => { e.stopPropagation(); sidebar.classList.toggle('open'); });
+        document.querySelector('.main-content').addEventListener('click', (e) => {
+            if (window.innerWidth <= 768 && sidebar.classList.contains('open')) {
+                if (!e.target.closest('.mobile-menu-btn') && !e.target.closest('.sidebar')) sidebar.classList.remove('open');
+            }
+        });
+        document.querySelectorAll('.menu-item').forEach(item => item.addEventListener('click', () => switchTab(item.dataset.tab)));
+        document.querySelectorAll('.close-modal').forEach(btn => btn.addEventListener('click', () => document.querySelectorAll('.modal').forEach(m => m.style.display = 'none')));
+        window.addEventListener('click', (e) => { if(e.target.classList?.contains('modal')) e.target.style.display = 'none'; });
+
+        // initial load
+        renderVehicles(); renderWorks(); renderSinistres(); updateDashboard(); fillSinistreSelect();
+    })();
 </script>
 </body>
 </html>
